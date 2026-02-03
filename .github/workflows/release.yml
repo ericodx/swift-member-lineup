@@ -72,4 +72,4 @@ jobs:
           commit-message: |
             swift-member-lineup ${{ needs.build-and-release.outputs.version }}
         env:
-          COMMITTER_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+          COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TOOLS_GITHUB_TOKEN }}
