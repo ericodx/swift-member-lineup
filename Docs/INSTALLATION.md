@@ -9,7 +9,7 @@ This document describes various ways to install Swift Member LineUp.
 The easiest way to install Swift Member LineUp is via Homebrew:
 
 ```bash
-brew tap ericodx/homebrew-tap
+brew tap ericodx/homebrew-tools
 brew install swift-member-lineup
 ```
 

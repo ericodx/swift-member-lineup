@@ -4,13 +4,13 @@ Guide to configure automatic Homebrew formula updates on each release.
 
 ---
 
-## homebrew-tap Repository
+## homebrew-tools Repository
 
 **URL:** https://github.com/new
 
 ### Create repository
 
-1. Name: `homebrew-tap`
+1. Name: `homebrew-tools`
 2. Visibility: **Public**
 3. Click **Create repository**
 
@@ -49,7 +49,7 @@ end
 | Resource owner | `ericodx` |
 | Expiration | 90 days |
 | Repository access | Only select repositories |
-| Select repositories | `ericodx/homebrew-tap` |
+| Select repositories | `ericodx/homebrew-tools` |
 
 3. Under **Permissions → Repository permissions**, configure:
 
@@ -92,14 +92,14 @@ git push origin v1.0.0
 
 Verify:
 1. swift-member-lineup Actions ran successfully
-2. PR was created in the homebrew-tap repository
+2. PR was created in the homebrew-tools repository
 
 ---
 
 ## Troubleshooting
 
 **PR not created:**
-- Verify the token has access to the `homebrew-tap` repository
+- Verify the token has access to the `homebrew-tools` repository
 - Verify Contents and Pull requests permissions are set to "Read and write"
 
 **Permission denied error:**
