@@ -30,8 +30,8 @@ flowchart TD
     B --> C[Build Binary]
     C --> D[Package Artifact]
     D --> E[Create GitHub Release]
-    E --> F[update-homebrew-tap<br/>ubuntu-latest]
-    F --> G[Create PR<br/>ericodx/homebrew-tap]
+    E --> F[update-homebrew-tools<br/>ubuntu-latest]
+    F --> G[Create PR<br/>ericodx/homebrew-tools]
 ```
 
 ## Jobs
@@ -53,7 +53,7 @@ flowchart TD
 - `version`: e.g., `v1.0.0`
 - `artifact_name`: e.g., `swift-member-lineup-v1.0.0-macos.tar.gz`
 
-### 2. update-homebrew-tap
+### 2. update-homebrew-tools
 
 **Environment**: `ubuntu-latest`
 
@@ -72,7 +72,7 @@ flowchart TD
 | `GITHUB_TOKEN` | Release creation (built-in) |
 | `HOMEBREW_TOOLS_GITHUB_TOKEN` | Homebrew Tap PR creation |
 
-**First time setup?** See [Homebrew Tap Setup](homebrew-tap-setup.md) for complete configuration instructions.
+**First time setup?** See [Homebrew Tap Setup](homebrew-tools-setup.md) for complete configuration instructions.
 
 ## Version Injection
 
@@ -106,7 +106,7 @@ git push origin v1.0.0
 2. Enter version (e.g., `1.0.0`)
 
 ### Post-Release
-1. Review and merge the PR in `ericodx/homebrew-tap`
+1. Review and merge the PR in `ericodx/homebrew-tools`
 2. Users can install: `brew install ericodx/tap/swift-member-lineup`
 
 ## Troubleshooting

@@ -30,7 +30,7 @@ It focuses exclusively on **members organization** of Swift types — not format
 The recommended way to install Swift Member LineUp is via Homebrew:
 
 ```bash
-brew tap ericodx/homebrew-tap
+brew tap ericodx/homebrew-tools
 brew install swift-member-lineup
 ```
 

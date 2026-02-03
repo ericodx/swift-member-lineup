@@ -103,7 +103,7 @@ graph TD
     end
 
     subgraph Rel[Release]
-        D1[build-and-release] --> D2[update-homebrew-tap]
+        D1[build-and-release] --> D2[update-homebrew-tools]
         D1 --> D3[notify]
         D2 --> D3
     end
@@ -229,7 +229,7 @@ GITHUB_TOKEN: # Built-in, no setup needed
 |----------|---------------|---------------|
 | **Pull Request Analysis** | `test-and-coverage`, `static-analysis` | `quality-gate` |
 | **Main Analysis** | `test-and-coverage`, `static-analysis` | `publish-code-analysis` |
-| **Release** | `build-and-release` | `update-homebrew-tap`, `notify` |
+| **Release** | `build-and-release` | `update-homebrew-tools`, `notify` |
 
 **Cost Optimization**: Jobs that only process artifacts (publishing, notifications) run on cheaper Linux runners.
 
@@ -332,7 +332,7 @@ Docs/CI/
 ├── main-analysis.md           # Main branch workflow details
 ├── release.md                 # Release workflow details
 ├── dependabot.md              # Dependabot configuration
-└── homebrew-tap-setup.md      # Homebrew Tap configuration guide
+└── homebrew-tools-setup.md    # Homebrew Tap configuration guide
 ```
 
 ## Quick Start
