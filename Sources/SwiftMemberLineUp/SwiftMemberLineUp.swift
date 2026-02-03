@@ -17,7 +17,7 @@ struct SwiftMemberLineUp: AsyncParsableCommand {
               swift-member-lineup fix --dry-run Sources/MyFile.swift
               swift-member-lineup init --force
             """,
-        version: "1.0.0",
+        version: Version.current,
         subcommands: [InitCommand.self, CheckCommand.self, FixCommand.self]
     )
 }

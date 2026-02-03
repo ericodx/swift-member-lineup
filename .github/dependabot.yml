@@ -9,6 +9,8 @@ updates:
       time: "03:00"
       timezone: "America/Sao_Paulo"
     open-pull-requests-limit: 3
+    commit-message:
+      prefix: "deps(swift)"
     assignees:
       - ericodx
     reviewers:
@@ -30,8 +32,10 @@ updates:
       day: "sunday"
       time: "03:00"
       timezone: "America/Sao_Paulo"
+    commit-message:
+      prefix: "deps(actions)"
     groups:
-      actions:
+      github-actions:
         patterns:
           - "*"
     assignees:

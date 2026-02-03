@@ -19,7 +19,7 @@ The root command that serves as the CLI entry point.
 | `commandName` | `"swift-member-lineup"` |
 | `abstract` | Short description for help |
 | `discussion` | Extended help with examples |
-| `version` | Semantic version string |
+| `version` | `Version.current` (see [Version](Version.md)) |
 | `subcommands` | Array of command types |
 
 ## Responsibilities

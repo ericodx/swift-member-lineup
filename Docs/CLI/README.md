@@ -6,7 +6,8 @@ Documentation for the Swift Member LineUp command-line interface with Swift 6 st
 
 ```text
 Sources/SwiftMemberLineUp/
-├── SwiftMemberLineUp.swift       # Entry point (@main)
+├── SwiftMemberLineUp.swift    # Entry point (@main)
+├── Version.swift              # Version management
 ├── Commands/                  # CLI commands with async/await
 ├── Core/                      # Domain models and logic
 ├── Infrastructure/            # Async file I/O abstractions
@@ -18,6 +19,7 @@ Sources/SwiftMemberLineUp/
 | Module | Description |
 |--------|-------------|
 | [SwiftMemberLineUp](SwiftMemberLineUp.md) | CLI entry point (`@main`) |
+| [Version](Version.md) | Version management |
 | [Commands](Commands/README.md) | CLI commands with Swift 6 concurrency |
 | [Core](Core/README.md) | Configuration, models, visitors |
 | [Infrastructure](Infrastructure/README.md) | Async file reading and writing |

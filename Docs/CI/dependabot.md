@@ -18,6 +18,8 @@ schedule:
   day: "sunday"
   time: "03:00"
   timezone: "America/Sao_Paulo"
+commit-message:
+  prefix: "deps(swift)"
 ```
 
 | Setting | Value | Description |
@@ -25,6 +27,7 @@ schedule:
 | Interval | Weekly (Sunday 03:00) | When to check for updates |
 | PR Limit | 3 | Maximum open PRs at once |
 | Major Updates | Ignored | Only minor/patch updates |
+| Commit Prefix | `deps(swift)` | Conventional commit prefix |
 
 **Labels applied**:
 - `dependencies`
@@ -42,17 +45,33 @@ schedule:
   day: "sunday"
   time: "03:00"
   timezone: "America/Sao_Paulo"
+commit-message:
+  prefix: "deps(actions)"
+groups:
+  github-actions:
+    patterns:
+      - "*"
 ```
 
 | Setting | Value | Description |
 |---------|-------|-------------|
 | Interval | Weekly (Sunday 03:00) | When to check for updates |
-| Grouping | All actions together | Single PR for all action updates |
+| Grouping | `github-actions` | Single PR for all action updates |
+| Commit Prefix | `deps(actions)` | Conventional commit prefix |
 
 **Labels applied**:
 - `dependencies`
 - `github-actions`
 - `auto-update`
+
+## Commit Message Format
+
+Dependabot uses conventional commit prefixes for clarity:
+
+| Ecosystem | Prefix | Example |
+|-----------|--------|---------|
+| Swift | `deps(swift)` | `deps(swift): bump Yams from 5.0.0 to 5.1.0` |
+| GitHub Actions | `deps(actions)` | `deps(actions): bump actions/checkout from 3 to 4` |
 
 ## Update Strategy
 
