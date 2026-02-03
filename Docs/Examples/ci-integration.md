@@ -117,7 +117,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git commit -m "fix: apply swift structure" || exit 0
+          git commit -m "fix: apply swift-member-lineup" || exit 0
           git push
 ```
 
