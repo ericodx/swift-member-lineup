@@ -26,6 +26,31 @@ repos:
             "(\\w+)",
           ]
 
+  # Local hooks
+  - repo: local
+    hooks:
+      - id: no-coauthor-no-description
+        name: ✓ No co-author or description
+        description: >
+          Block commits that contain Co-Authored-By or a description body.
+          Only single-line commit messages are allowed.
+        entry: |
+          bash -c '
+            MSG=$(cat "$1")
+            if echo "$MSG" | grep -iq "Co-Authored-By:"; then
+              echo "Error: Co-Authored-By is not allowed in commit messages."
+              exit 1
+            fi
+            BODY=$(echo "$MSG" | sed "/^#/d" | tail -n +2 | sed "/^$/d")
+            if [ -n "$BODY" ]; then
+              echo "Error: Description body is not allowed. Use single-line commits only."
+              exit 1
+            fi
+          ' --
+        language: system
+        always_run: true
+        stages: [commit-msg]
+
   # Core pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
