@@ -1,0 +1,44 @@
+version: 2
+
+updates:
+  - package-ecosystem: "swift"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "03:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 3
+    assignees:
+      - ericodx
+    reviewers:
+      - ericodx
+    labels:
+      - "dependencies"
+      - "swift"
+      - "spm"
+      - "auto-update"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "03:00"
+      timezone: "America/Sao_Paulo"
+    groups:
+      actions:
+        patterns:
+          - "*"
+    assignees:
+      - ericodx
+    reviewers:
+      - ericodx
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "auto-update"
