@@ -1,7 +1,9 @@
 # Swift Member LineUp
 
 ![Platform](https://img.shields.io/badge/platform-macOS-orange?logo=apple&logoColor=white)
+
 ![Swift](https://img.shields.io/badge/swift-6.0+-orange?logo=swift&logoColor=white)
+
 [![CI](https://github.com/ericodx/swift-member-lineup/actions/workflows/main-analysis.yml/badge.svg)](https://github.com/ericodx/swift-member-lineup/actions/workflows/main-analysis.yml)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=deploy-on-friday-swift-member-lineup&metric=alert_status)](https://sonarcloud.io/dashboard?id=deploy-on-friday-swift-member-lineup)
