@@ -20,7 +20,7 @@ Create the file `Formula/swift-member-lineup.rb`:
 
 ```ruby
 class SwiftMemberLineUp < Formula
-  desc "Swift project structure analyzer"
+  desc "CLI tool for organizing Swift type members"
   homepage "https://github.com/ericodx/swift-member-lineup"
   url "https://github.com/ericodx/swift-member-lineup/releases/download/v1.0.0/swift-member-lineup-v1.0.0-macos.tar.gz"
   sha256 "placeholder"
