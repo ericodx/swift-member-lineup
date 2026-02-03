@@ -243,11 +243,11 @@ jobs:
           echo "SONAR_VERSION=$SONAR_VERSION" >> $GITHUB_ENV
 
       - name: Publish Code Analysis
-        if: env.SONAR_TOKEN != ''
+        if: ${{ secrets.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
             -Dsonar.projectVersion=${{ env.SONAR_VERSION }}
-            -Dsonar.host.url=${{ vars.SONAR_HOST_URL }}
+            -Dsonar.host.url=${{ vars.SONAR_HOST_URL || 'https://sonarcloud.io' }}
