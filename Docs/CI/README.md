@@ -78,9 +78,9 @@ graph TD
 
 | Type | Description | Target | Current |
 |------|-------------|--------|---------|
-| **Regions Coverage** | Blocks of executable code | ≥98% | 99.28% |
-| **Lines Coverage** | Lines of code executed | ≥95% | 100.00% |
-| **Functions Coverage** | Functions called | ≥95% | 100.00% |
+| **Lines Coverage** | Lines of code executed | ≥98% | 100.00% |
+| **Regions Coverage** | Blocks of executable code | - | 99.28% |
+| **Functions Coverage** | Functions called | - | 100.00% |
 
 ### Static Analysis Metrics
 
@@ -94,7 +94,7 @@ graph TD
 
 ```mermaid
 flowchart TD
-    A[Start Quality Gate] --> B[Read Coverage: 99.28%]
+    A[Start Quality Gate] --> B[Read Coverage: 100.00%]
     B --> C{Coverage ≥ Threshold?}
     C -->|Yes| D[✓ Pass]
     C -->|No| E[✗ Fail]
@@ -131,7 +131,7 @@ flowchart TD
 | Artifact | Content | Purpose | Consumers |
 |----------|---------|---------|-----------|
 | **coverage/lcov.info** | LCOV format coverage data | SonarQube integration | Quality Gate |
-| **coverage/regions-percent.txt** | Regions coverage percentage | Quality gate calculation | Quality Gate |
+| **coverage/lines-percent.txt** | Lines coverage percentage | Quality gate calculation | Quality Gate |
 | **reports/swiftlint.json** | SwiftLint findings | Style analysis | Quality Gate |
 | **reports/periphery.json** | Dead code findings | Code cleanup | Quality Gate |
 | **reports/gitleaks.sarif** | Security findings | Security audit | Quality Gate |
@@ -233,8 +233,8 @@ sequenceDiagram
 ### Common Issues
 
 #### Coverage Issues
-- **Empty Coverage**: Check `regions-percent.txt` generation
-- **100% vs 99.28%**: Ensure using Regions Coverage (column 4)
+- **Empty Coverage**: Check `lines-percent.txt` generation
+- **Incorrect Value**: Ensure using Lines Coverage
 - **File Not Found**: Verify artifact upload/download
 
 #### Quality Gate Failures
@@ -251,7 +251,7 @@ sequenceDiagram
 
 Enable debug output by checking workflow logs for:
 ```
- DEBUG: Regions Coverage from file = 99.28%
+ DEBUG: Lines Coverage from file = 100.00%
  DEBUG: LINT_COUNT=0, DEAD_CODE_COUNT=0, SECRETS_COUNT=0
  DEBUG: FAIL=0
 ```
@@ -267,7 +267,7 @@ Enable debug output by checking workflow logs for:
 
 ### Quality Standards
 
-1. **High Coverage**: Target 99.28% regions coverage
+1. **High Coverage**: Target 100% lines coverage
 2. **Zero Tolerance**: No secrets or critical issues
 3. **Clean Code**: Minimize lint violations and dead code
 4. **Fast Feedback**: Provide quick, actionable feedback
