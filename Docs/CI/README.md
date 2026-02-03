@@ -6,7 +6,21 @@ This document describes the continuous integration and deployment processes impl
 
 ## Workflows
 
-### 1. Main Analysis (`main-analysis.yml`)
+### 1. Pull Request Analysis (`pull-request-analysis.yml`)
+
+Quality analysis workflow that runs on every pull request targeting main.
+
+**Documentation:** [pull-request-analysis.md](pull-request-analysis.md)
+
+**Purpose:**
+- **Fast Feedback**: Quick quality checks on PR changes
+- **Quality Gate**: Enforce coverage and security thresholds
+- **PR Comments**: Automatic quality reports on PRs
+
+**Triggers:**
+- Pull requests to `main` (opened, synchronize, reopened)
+
+### 2. Main Analysis (`main-analysis.yml`)
 
 Comprehensive workflow that runs on pushes to the main branch for production readiness.
 
@@ -24,7 +38,7 @@ Comprehensive workflow that runs on pushes to the main branch for production rea
 - **Code Quality**: ≤5 violations - Target: ≤5
 - **Documentation**: 85% coverage - Target: ≥80%
 
-### 2. Release (`release.yml`)
+### 3. Release (`release.yml`)
 
 Automated workflow for building and releasing Swift Member LineUp binaries.
 
@@ -40,6 +54,19 @@ Automated workflow for building and releasing Swift Member LineUp binaries.
 - **Automatic**: Tag pushes matching `v*` pattern
 - **Manual**: On-demand with version input
 
+### 4. Dependabot
+
+Automated dependency updates for Swift packages and GitHub Actions.
+
+**Documentation:** [dependabot.md](dependabot.md)
+
+**Purpose:**
+- **Swift Dependencies**: Weekly updates (minor/patch only)
+- **GitHub Actions**: Weekly updates (grouped)
+- **Security**: Keep dependencies current
+
+**Schedule:** Weekly on Sundays at 03:00 (America/Sao_Paulo)
+
 ## Workflow Architecture
 
 ### Overall Flow
@@ -47,19 +74,29 @@ Automated workflow for building and releasing Swift Member LineUp binaries.
 ```mermaid
 flowchart TD
     A[Developer Push] --> B{Branch Type}
-    B -->|main| C[main-analysis]
+    B -->|feature| C[pull-request-analysis]
+    B -->|main| D[main-analysis]
 
-    C --> D[Production Ready]
+    C --> E[Quality Gate]
+    D --> F[Production Ready]
 
-    E[Tag Push] --> F[release]
-    F --> G[Binary Distribution]
-    F --> H[Homebrew Update]
+    G[Tag Push] --> H[release]
+    H --> I[Binary Distribution]
+    H --> J[Homebrew Update]
+
+    K[Weekly Schedule] --> L[Dependabot]
+    L --> M[Dependency PRs]
 ```
 
 ### Job Dependencies
 
 ```mermaid
 graph TD
+    subgraph PR[Pull Request Analysis]
+        A1[test-and-coverage] --> A2[static-analysis]
+        A2 --> A3[quality-gate<br/>ubuntu-latest]
+    end
+
     subgraph Main[Main Analysis]
         B1[test-and-coverage] --> B3[publish-code-analysis<br/>ubuntu-latest]
         B2[static-analysis] --> B3
@@ -180,6 +217,7 @@ GITHUB_TOKEN: # Built-in, no setup needed
 
 | Workflow | Average Time | Optimization |
 |----------|--------------|--------------|
+| **Pull Request Analysis** | 8-14 minutes | Fast feedback |
 | **Main Analysis** | 30-47 minutes | Comprehensive analysis |
 | **Release** | 10-15 minutes | Binary build and distribution |
 
@@ -189,6 +227,7 @@ GITHUB_TOKEN: # Built-in, no setup needed
 
 | Workflow | Jobs on macOS | Jobs on Linux |
 |----------|---------------|---------------|
+| **Pull Request Analysis** | `test-and-coverage`, `static-analysis` | `quality-gate` |
 | **Main Analysis** | `test-and-coverage`, `static-analysis` | `publish-code-analysis` |
 | **Release** | `build-and-release` | `update-homebrew-tap`, `notify` |
 
@@ -216,12 +255,17 @@ graph LR
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
+    participant PR as Pull Request
+    participant PRA as PR Analysis
     participant MA as Main Analysis
     participant REL as Release
 
-    Dev->>MA: Push to main
+    Dev->>PR: Push to feature branch
+    PR->>PRA: Trigger analysis
+    PRA->>PR: Quality report comment
+
+    Dev->>MA: Merge to main
     MA->>MA: Comprehensive analysis
-    MA->>MA: Prepare release
 
     Dev->>REL: Create tag
     REL->>REL: Build and release
@@ -283,10 +327,12 @@ Enable debug output by checking workflow logs for:
 
 ```
 Docs/CI/
-├── README.md              # This file - Overview
-├── main-analysis.md       # Main branch workflow details
-├── release.md             # Release workflow details
-└── homebrew-tap-setup.md  # Homebrew Tap configuration guide
+├── README.md                  # This file - Overview
+├── pull-request-analysis.md   # PR workflow details
+├── main-analysis.md           # Main branch workflow details
+├── release.md                 # Release workflow details
+├── dependabot.md              # Dependabot configuration
+└── homebrew-tap-setup.md      # Homebrew Tap configuration guide
 ```
 
 ## Quick Start
