@@ -37,6 +37,12 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "artifact_name=swift-member-lineup-$VERSION-macos.tar.gz" >> $GITHUB_OUTPUT
 
+      - name: Inject version
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          VERSION="${VERSION#v}"
+          echo "enum Version { static let current = \"$VERSION\" }" > Sources/SwiftMemberLineUp/Version.swift
+
       - name: Build
         run: swift build -c release
 
