@@ -49,4 +49,4 @@ line_length:
 
 # Set different limits for Tests
 configs:
-  - path: Tests/SwiftStructureTests/.swiftlint.yml
+  - path: Tests/SwiftMemberLineUpTests/.swiftlint.yml
