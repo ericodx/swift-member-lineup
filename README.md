@@ -2,7 +2,6 @@
 
 ![Platform](https://img.shields.io/badge/platform-macOS-orange?logo=apple&logoColor=white)
 ![Swift](https://img.shields.io/badge/swift-6.0+-orange?logo=swift&logoColor=white)
-![Build](https://github.com/ericodx/swift-member-lineup/actions/workflows/pull-request-analysis.yml/badge.svg?branch=develop)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=deploy-on-friday-swift-member-lineup&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=deploy-on-friday-swift-member-lineup)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=deploy-on-friday-swift-member-lineup&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=deploy-on-friday-swift-member-lineup)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=deploy-on-friday-swift-member-lineup&metric=coverage)](https://sonarcloud.io/summary/new_code?id=deploy-on-friday-swift-member-lineup)
