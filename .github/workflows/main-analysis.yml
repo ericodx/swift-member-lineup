@@ -230,8 +230,24 @@ jobs:
           name: reports
           path: reports
 
+      - name: Compute project version
+        run: |
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+
+          if [ -z "$TAG" ]; then
+            SONAR_VERSION="v1.0.0"
+          else
+            SONAR_VERSION=$TAG
+          fi
+
+          echo "SONAR_VERSION=$SONAR_VERSION" >> $GITHUB_ENV
+
       - name: Publish Code Analysis
         if: env.SONAR_TOKEN != ''
         uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectVersion=${{ env.SONAR_VERSION }}
+            -Dsonar.host.url=${{ vars.SONAR_HOST_URL }}
