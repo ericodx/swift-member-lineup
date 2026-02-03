@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  build-and-release:
+    runs-on: macos-26
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      artifact_name: ${{ steps.version.outputs.artifact_name }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: swift-actions/setup-swift@v3
+        with:
+          swift-version: "6.2.3"
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            [[ ! $VERSION =~ ^v ]] && VERSION="v$VERSION"
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "artifact_name=swift-member-lineup-$VERSION-macos.tar.gz" >> $GITHUB_OUTPUT
+
+      - name: Build
+        run: swift build -c release
+
+      - name: Package
+        run: |
+          mkdir -p release
+          cp .build/release/SwiftMemberLineUp release/
+          cd release && tar -czf "${{ steps.version.outputs.artifact_name }}" SwiftMemberLineUp
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          files: release/${{ steps.version.outputs.artifact_name }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update-homebrew-tap:
+    runs-on: ubuntu-latest
+    needs: build-and-release
+
+    steps:
+      - name: Update Homebrew Formula
+        uses: mislav/bump-homebrew-formula-action@v3
+        with:
+          formula-name: swift-member-lineup
+          homebrew-tap: ericodx/homebrew-tap
+          tag-name: ${{ needs.build-and-release.outputs.version }}
+          download-url: https://github.com/ericodx/swift-member-lineup/releases/download/${{ needs.build-and-release.outputs.version }}/${{ needs.build-and-release.outputs.artifact_name }}
+          create-pullrequest: true
+          commit-message: |
+            swift-member-lineup ${{ needs.build-and-release.outputs.version }}
+        env:
+          COMMITTER_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
