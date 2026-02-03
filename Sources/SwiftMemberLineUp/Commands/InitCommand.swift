@@ -1,0 +1,67 @@
+import ArgumentParser
+import Foundation
+
+struct InitCommand: ParsableCommand {
+
+    // MARK: - Configuration
+
+    static let configuration = CommandConfiguration(
+        commandName: "init",
+        abstract: "Create a default .swift-member-lineup.yaml configuration file.",
+        discussion: """
+            Creates a .swift-member-lineup.yaml configuration file in the current \
+            directory with default member ordering rules.
+
+            EXAMPLES:
+              swift-member-lineup init
+              swift-member-lineup init --force
+            """
+    )
+
+    // MARK: - Arguments
+
+    @Flag(name: .long, help: "Overwrite existing configuration file.")
+    var force: Bool = false
+
+    // MARK: - Properties
+
+    private static let configFileName = ".swift-member-lineup.yaml"
+
+    // MARK: - Execution
+
+    func run() throws {
+        let configPath = FileManager.default.currentDirectoryPath + "/" + Self.configFileName
+
+        if FileManager.default.fileExists(atPath: configPath) && !force {
+            throw InitError.configAlreadyExists(configPath)
+        }
+
+        try defaultConfigContent.write(toFile: configPath, atomically: true, encoding: .utf8)
+        print("Created \(Self.configFileName)")
+    }
+
+    // MARK: - Private Helpers
+
+    private var defaultConfigContent: String {
+        """
+        version: 1
+
+        ordering:
+          members:
+            - typealias
+            - associatedtype
+            - initializer
+            - type_property
+            - instance_property
+            - subtype
+            - type_method
+            - instance_method
+            - subscript
+            - deinitializer
+
+        extensions:
+          strategy: separate
+          respect_boundaries: true
+        """
+    }
+}
