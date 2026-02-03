@@ -44,9 +44,10 @@ flowchart TD
 1. Checkout repository
 2. Setup Swift
 3. Determine version (add `v` prefix if missing)
-4. Build release binary
-5. Package artifact (`.tar.gz`)
-6. Create GitHub Release with auto-generated release notes
+4. Inject version into `Version.swift`
+5. Build release binary
+6. Package artifact (`.tar.gz`)
+7. Create GitHub Release with auto-generated release notes
 
 **Outputs:**
 - `version`: e.g., `v1.0.0`
@@ -73,6 +74,25 @@ flowchart TD
 
 **First time setup?** See [Homebrew Tap Setup](homebrew-tap-setup.md) for complete configuration instructions.
 
+## Version Injection
+
+The CLI version is dynamically injected during the release build:
+
+```yaml
+- name: Inject version
+  run: |
+    VERSION="${{ steps.version.outputs.version }}"
+    VERSION="${VERSION#v}"  # Remove 'v' prefix
+    echo "enum Version { static let current = \"$VERSION\" }" > Sources/SwiftMemberLineUp/Version.swift
+```
+
+| Context | `--version` Output |
+|---------|-------------------|
+| Development | `0.0.0-dev` |
+| Release binary | `1.2.3` |
+
+See [CLI/Version](../CLI/Version.md) for more details.
+
 ## Release Process
 
 ### Via Tag Push
@@ -93,6 +113,6 @@ git push origin v1.0.0
 
 **Build Failures**: Check Swift version compatibility.
 
-**Homebrew PR Failures**: Verify `TAP_GITHUB_TOKEN` has correct permissions.
+**Homebrew PR Failures**: Verify `HOMEBREW_TOOLS_GITHUB_TOKEN` has correct permissions.
 
 **Release not created**: Ensure tag format is `v1.2.3`.
