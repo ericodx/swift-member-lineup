@@ -69,7 +69,7 @@ flowchart TD
 | Secret | Purpose |
 |--------|---------|
 | `GITHUB_TOKEN` | Release creation (built-in) |
-| `TAP_GITHUB_TOKEN` | Homebrew Tap PR creation |
+| `HOMEBREW_TOOLS_GITHUB_TOKEN` | Homebrew Tap PR creation |
 
 **First time setup?** See [Homebrew Tap Setup](homebrew-tap-setup.md) for complete configuration instructions.
 

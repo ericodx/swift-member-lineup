@@ -35,7 +35,7 @@ end
 
 ## Personal Access Token
 
-**URL:** https://github.com/settings/tokens?type=beta
+**URL:** https://github.com/settings/personal-access-tokens
 
 ### Create token
 
@@ -45,9 +45,9 @@ end
 | Field | Value |
 |-------|-------|
 | Token name | `swift-member-lineup-tap-token` |
-| Description | `Token to update Homebrew tap formula via release workflow` |
-| Expiration | 90 days |
+| Description | `Token to update Homebrew tap formula via release workflow.` |
 | Resource owner | `ericodx` |
+| Expiration | 90 days |
 | Repository access | Only select repositories |
 | Select repositories | `ericodx/homebrew-tap` |
 
@@ -74,7 +74,7 @@ end
 
 | Field | Value |
 |-------|-------|
-| Name | `TAP_GITHUB_TOKEN` |
+| Name | `HOMEBREW_TOOLS_GITHUB_TOKEN` |
 | Secret | (paste the token copied above) |
 
 3. Click **Add secret**
@@ -104,4 +104,4 @@ Verify:
 
 **Permission denied error:**
 - Regenerate the token with correct permissions
-- Verify the `TAP_GITHUB_TOKEN` secret was saved correctly
+- Verify the `HOMEBREW_TOOLS_GITHUB_TOKEN` secret was saved correctly
