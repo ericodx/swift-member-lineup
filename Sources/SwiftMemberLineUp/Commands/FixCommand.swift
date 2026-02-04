@@ -109,17 +109,15 @@ struct FixCommand: AsyncParsableCommand {
         let fileManager = FileManager.default
         let url = URL(fileURLWithPath: directory)
 
-        guard let enumerator = fileManager.enumerator(
+        let enumerator = fileManager.enumerator(
             at: url,
             includingPropertiesForKeys: [.isRegularFileKey],
             options: [.skipsHiddenFiles]
-        ) else {
-            return []
-        }
+        )
 
         var swiftFiles: [String] = []
 
-        for case let fileURL as URL in enumerator {
+        while let fileURL = enumerator?.nextObject() as? URL {
             if fileURL.pathExtension == "swift" {
                 swiftFiles.append(fileURL.path)
             }
