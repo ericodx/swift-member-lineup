@@ -15,7 +15,8 @@ Example configurations for different project types and use cases.
 
 | Guide | Description |
 |-------|-------------|
-| [Xcode Integration](xcode-integration.md) | Build phases, scripts, and editor extensions |
+| [Xcode Integration](xcode-integration.md) | Build phases and Xcode behaviors |
+| [Git Hooks](git-hooks.md) | Pre-commit hooks for automatic checking |
 | [CI Integration](ci-integration.md) | GitHub Actions, GitLab CI, Bitrise |
 
 ## Quick Start
@@ -30,7 +31,7 @@ Example configurations for different project types and use cases.
 cp Docs/Examples/swiftui.yaml .swift-member-lineup.yaml
 
 # Check your files
-swift-member-lineup check Sources/**/*.swift
+swift-member-lineup check --path Sources
 ```
 
 ## Choosing an Example

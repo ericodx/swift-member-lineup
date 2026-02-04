@@ -1,4 +1,5 @@
 import ArgumentParser
+import Foundation
 
 struct CheckCommand: AsyncParsableCommand {
 
@@ -13,15 +14,19 @@ struct CheckCommand: AsyncParsableCommand {
 
             EXAMPLES:
               swift-member-lineup check Sources/*.swift
-              swift-member-lineup check --quiet Sources/**/*.swift
-              swift-member-lineup check --config .swift-member-lineup.yaml Sources/
+              swift-member-lineup check --path Sources
+              swift-member-lineup check --xcode --path Sources
+              swift-member-lineup check --config .swift-member-lineup.yaml --path Sources/
             """
     )
 
     // MARK: - Arguments
 
     @Argument(help: "Swift source files to analyze.")
-    var files: [String]
+    var files: [String] = []
+
+    @Option(name: .shortAndLong, help: "Directory to recursively search for Swift files.")
+    var path: String?
 
     @Option(name: .shortAndLong, help: "Path to configuration file.")
     var config: String?
@@ -29,16 +34,28 @@ struct CheckCommand: AsyncParsableCommand {
     @Flag(name: .shortAndLong, help: "Only show files that need reordering.")
     var quiet: Bool = false
 
+    @Flag(name: .long, help: "Exit with code 0 even if files need reordering.")
+    var warnOnly: Bool = false
+
+    @Flag(name: .long, help: "Output warnings in Xcode-compatible format. Implies --warn-only.")
+    var xcode: Bool = false
+
     // MARK: - Execution
 
     func run() async throws {
+        let filesToCheck = try resolveFiles()
+
+        guard !filesToCheck.isEmpty else {
+            throw ValidationError("No Swift files found. Provide files as arguments or use --path.")
+        }
+
         let fileIO = FileIOActor()
         let fileReader = FileReader()
         let configService = ConfigurationService(fileReader: fileReader)
         let configuration = try await configService.load(configPath: config)
 
         let coordinator = PipelineCoordinator(fileIO: fileIO, configuration: configuration)
-        let results = try await coordinator.checkFiles(files)
+        let results = try await coordinator.checkFiles(filesToCheck)
 
         var totalTypes = 0
         var typesNeedingReorder = 0
@@ -52,7 +69,9 @@ struct CheckCommand: AsyncParsableCommand {
                 typesNeedingReorder += result.results.filter(\.needsReordering).count
             }
 
-            if !quiet {
+            if xcode {
+                printXcodeWarnings(path: result.path, results: result.results)
+            } else if !quiet {
                 let reportStage = ReorderReportStage()
                 let reorderOutput = ReorderOutput(path: result.path, results: result.results)
                 let reportOutput = try reportStage.process(reorderOutput)
@@ -61,19 +80,28 @@ struct CheckCommand: AsyncParsableCommand {
             }
         }
 
-        printSummary(
-            totalFiles: files.count,
-            totalTypes: totalTypes,
-            filesNeedingReorder: filesNeedingReorder,
-            typesNeedingReorder: typesNeedingReorder
-        )
+        if !xcode {
+            printSummary(
+                totalFiles: filesToCheck.count,
+                totalTypes: totalTypes,
+                filesNeedingReorder: filesNeedingReorder,
+                typesNeedingReorder: typesNeedingReorder
+            )
+        }
 
-        if !filesNeedingReorder.isEmpty {
+        let shouldFail = !filesNeedingReorder.isEmpty && !warnOnly && !xcode
+        if shouldFail {
             throw ExitCode(1)
         }
     }
 
     // MARK: - Private Helpers
+
+    private func printXcodeWarnings(path: String, results: [TypeReorderResult]) {
+        for result in results where result.needsReordering {
+            print("\(path):\(result.line): warning: '\(result.name)' members need reordering")
+        }
+    }
 
     private func printSummary(
         totalFiles: Int,
@@ -97,5 +125,37 @@ struct CheckCommand: AsyncParsableCommand {
             print("✗ \(typesNeedingReorder) \(typeWord) in \(filesNeedingReorder.count) \(fileWord) reordering")
             print("  Run 'swift-member-lineup fix' to apply changes")
         }
+    }
+
+    private func resolveFiles() throws -> [String] {
+        var result = files
+
+        if let path = path {
+            let pathFiles = findSwiftFiles(in: path)
+            result.append(contentsOf: pathFiles)
+        }
+
+        return result
+    }
+
+    private func findSwiftFiles(in directory: String) -> [String] {
+        let fileManager = FileManager.default
+        let url = URL(fileURLWithPath: directory)
+
+        let enumerator = fileManager.enumerator(
+            at: url,
+            includingPropertiesForKeys: [.isRegularFileKey],
+            options: [.skipsHiddenFiles]
+        )
+
+        var swiftFiles: [String] = []
+
+        while let fileURL = enumerator?.nextObject() as? URL {
+            if fileURL.pathExtension == "swift" {
+                swiftFiles.append(fileURL.path)
+            }
+        }
+
+        return swiftFiles.sorted()
     }
 }
