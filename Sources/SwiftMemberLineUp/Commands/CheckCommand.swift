@@ -15,7 +15,7 @@ struct CheckCommand: AsyncParsableCommand {
             EXAMPLES:
               swift-member-lineup check Sources/*.swift
               swift-member-lineup check --path Sources
-              swift-member-lineup check --path Sources --warn-only
+              swift-member-lineup check --xcode --path Sources
               swift-member-lineup check --config .swift-member-lineup.yaml --path Sources/
             """
     )
@@ -34,8 +34,11 @@ struct CheckCommand: AsyncParsableCommand {
     @Flag(name: .shortAndLong, help: "Only show files that need reordering.")
     var quiet: Bool = false
 
-    @Flag(name: .long, help: "Exit with code 0 even if files need reordering. Useful for Xcode Build Phases.")
+    @Flag(name: .long, help: "Exit with code 0 even if files need reordering.")
     var warnOnly: Bool = false
+
+    @Flag(name: .long, help: "Output warnings in Xcode-compatible format. Implies --warn-only.")
+    var xcode: Bool = false
 
     // MARK: - Execution
 
@@ -66,7 +69,9 @@ struct CheckCommand: AsyncParsableCommand {
                 typesNeedingReorder += result.results.filter(\.needsReordering).count
             }
 
-            if !quiet {
+            if xcode {
+                printXcodeWarnings(path: result.path, results: result.results)
+            } else if !quiet {
                 let reportStage = ReorderReportStage()
                 let reorderOutput = ReorderOutput(path: result.path, results: result.results)
                 let reportOutput = try reportStage.process(reorderOutput)
@@ -75,19 +80,28 @@ struct CheckCommand: AsyncParsableCommand {
             }
         }
 
-        printSummary(
-            totalFiles: filesToCheck.count,
-            totalTypes: totalTypes,
-            filesNeedingReorder: filesNeedingReorder,
-            typesNeedingReorder: typesNeedingReorder
-        )
+        if !xcode {
+            printSummary(
+                totalFiles: filesToCheck.count,
+                totalTypes: totalTypes,
+                filesNeedingReorder: filesNeedingReorder,
+                typesNeedingReorder: typesNeedingReorder
+            )
+        }
 
-        if !filesNeedingReorder.isEmpty && !warnOnly {
+        let shouldFail = !filesNeedingReorder.isEmpty && !warnOnly && !xcode
+        if shouldFail {
             throw ExitCode(1)
         }
     }
 
     // MARK: - Private Helpers
+
+    private func printXcodeWarnings(path: String, results: [TypeReorderResult]) {
+        for result in results where result.needsReordering {
+            print("\(path):\(result.line): warning: '\(result.name)' members need reordering")
+        }
+    }
 
     private func printSummary(
         totalFiles: Int,
