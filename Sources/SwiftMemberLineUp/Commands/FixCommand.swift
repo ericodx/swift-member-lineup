@@ -5,6 +5,23 @@ struct FixCommand: AsyncParsableCommand {
 
     // MARK: - Configuration
 
+    @Argument(help: "Swift source files to fix.")
+    var files: [String] = []
+
+    @Option(name: .shortAndLong, help: "Directory to recursively search for Swift files.")
+    var path: String?
+
+    @Option(name: .shortAndLong, help: "Path to configuration file.")
+    var config: String?
+
+    @Flag(name: .long, help: "Show changes without modifying files.")
+    var dryRun: Bool = false
+
+    @Flag(name: .shortAndLong, help: "Only show summary.")
+    var quiet: Bool = false
+
+    // MARK: - Arguments
+
     static let configuration = CommandConfiguration(
         commandName: "fix",
         abstract: "Reorder members in Swift files.",
@@ -20,23 +37,6 @@ struct FixCommand: AsyncParsableCommand {
               swift-member-lineup fix --quiet --config custom.yaml --path Sources/
             """
     )
-
-    // MARK: - Arguments
-
-    @Argument(help: "Swift source files to fix.")
-    var files: [String] = []
-
-    @Option(name: .shortAndLong, help: "Directory to recursively search for Swift files.")
-    var path: String?
-
-    @Option(name: .shortAndLong, help: "Path to configuration file.")
-    var config: String?
-
-    @Flag(name: .long, help: "Show changes without modifying files.")
-    var dryRun: Bool = false
-
-    @Flag(name: .shortAndLong, help: "Only show summary.")
-    var quiet: Bool = false
 
     // MARK: - Execution
 

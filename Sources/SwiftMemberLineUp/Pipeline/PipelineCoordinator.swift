@@ -1,20 +1,13 @@
 actor PipelineCoordinator {
 
-    private let fileIO: FileIOActor
-    private let configuration: Configuration
-
     init(fileIO: FileIOActor, configuration: Configuration) {
         self.fileIO = fileIO
         self.configuration = configuration
     }
+    private let fileIO: FileIOActor
+    private let configuration: Configuration
 
     // MARK: - Check Operation
-
-    struct CheckResult: Sendable {
-        let path: String
-        let results: [TypeReorderResult]
-        let needsReorder: Bool
-    }
 
     func checkFiles(_ paths: [String]) async throws -> [CheckResult] {
         let pipeline = ParseStage()
@@ -36,27 +29,7 @@ actor PipelineCoordinator {
         }
     }
 
-    private func checkSingleFile(
-        path: String, pipeline: any Stage<ParseInput, ReorderOutput>
-    ) async throws -> CheckResult {
-        let source = try await fileIO.read(at: path)
-        let input = ParseInput(path: path, source: source)
-        let output = try pipeline.process(input)
-        let needsReorder = needsReordering(output.results)
-        return CheckResult(path: path, results: output.results, needsReorder: needsReorder)
-    }
-
-    private func needsReordering(_ results: [TypeReorderResult]) -> Bool {
-        return results.contains { $0.needsReordering }
-    }
-
     // MARK: - Fix Operation
-
-    struct FixResult: Sendable {
-        let path: String
-        let source: String
-        let modified: Bool
-    }
 
     func fixFiles(_ paths: [String], dryRun: Bool) async throws -> [FixResult] {
         let pipeline = ParseStage()
@@ -77,6 +50,22 @@ actor PipelineCoordinator {
             }
             return results
         }
+    }
+
+    // MARK: - Private Helpers
+
+    private func checkSingleFile(
+        path: String, pipeline: any Stage<ParseInput, ReorderOutput>
+    ) async throws -> CheckResult {
+        let source = try await fileIO.read(at: path)
+        let input = ParseInput(path: path, source: source)
+        let output = try pipeline.process(input)
+        let needsReorder = needsReordering(output.results)
+        return CheckResult(path: path, results: output.results, needsReorder: needsReorder)
+    }
+
+    private func needsReordering(_ results: [TypeReorderResult]) -> Bool {
+        return results.contains { $0.needsReordering }
     }
 
     private func fixSingleFile(

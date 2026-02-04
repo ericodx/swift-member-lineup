@@ -26,7 +26,7 @@ struct SwiftFileResolverTests {
 
     @Test("Given path to directory with Swift files, when resolving, then returns found files")
     func resolveWithPath() throws {
-        let (tempDir, cleanup) = try createTempDirectory()
+        let (tempDir, cleanup) = try createTempDirectoryWithCleanup()
         defer { cleanup() }
 
         let file1 = tempDir.appendingPathComponent("File1.swift")
@@ -44,7 +44,7 @@ struct SwiftFileResolverTests {
 
     @Test("Given files and path, when resolving, then combines both")
     func resolveWithFilesAndPath() throws {
-        let (tempDir, cleanup) = try createTempDirectory()
+        let (tempDir, cleanup) = try createTempDirectoryWithCleanup()
         defer { cleanup() }
 
         let pathFile = tempDir.appendingPathComponent("PathFile.swift")
@@ -60,7 +60,7 @@ struct SwiftFileResolverTests {
 
     @Test("Given path to directory with nested Swift files, when resolving, then finds files recursively")
     func resolveWithNestedPath() throws {
-        let (tempDir, cleanup) = try createTempDirectory()
+        let (tempDir, cleanup) = try createTempDirectoryWithCleanup()
         defer { cleanup() }
 
         let nestedDir = tempDir.appendingPathComponent("Nested")
@@ -81,7 +81,7 @@ struct SwiftFileResolverTests {
 
     @Test("Given path to directory with non-Swift files, when resolving, then ignores them")
     func resolveIgnoresNonSwiftFiles() throws {
-        let (tempDir, cleanup) = try createTempDirectory()
+        let (tempDir, cleanup) = try createTempDirectoryWithCleanup()
         defer { cleanup() }
 
         let swiftFile = tempDir.appendingPathComponent("File.swift")
@@ -100,7 +100,7 @@ struct SwiftFileResolverTests {
 
     @Test("Given path to empty directory, when resolving, then returns empty array")
     func resolveWithEmptyDirectory() throws {
-        let (tempDir, cleanup) = try createTempDirectory()
+        let (tempDir, cleanup) = try createTempDirectoryWithCleanup()
         defer { cleanup() }
 
         let result = SwiftFileResolver.resolve(files: [], path: realPath(tempDir))
@@ -117,7 +117,7 @@ struct SwiftFileResolverTests {
 
     @Test("Given path to directory, when resolving, then returns sorted files")
     func resolveReturnsSortedFiles() throws {
-        let (tempDir, cleanup) = try createTempDirectory()
+        let (tempDir, cleanup) = try createTempDirectoryWithCleanup()
         defer { cleanup() }
 
         let fileC = tempDir.appendingPathComponent("C.swift")
@@ -134,24 +134,5 @@ struct SwiftFileResolverTests {
 
         let fileNames = result.map { URL(fileURLWithPath: $0).lastPathComponent }
         #expect(fileNames == ["A.swift", "B.swift", "C.swift"])
-    }
-
-    // MARK: - Private Helpers
-
-    private func createTempDirectory() throws -> (URL, () -> Void) {
-        let tempDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
-
-        let cleanup: () -> Void = { _ = try? FileManager.default.removeItem(at: tempDir) }
-
-        return (tempDir, cleanup)
-    }
-
-    private func realPath(_ url: URL) -> String {
-        if url.path.hasPrefix("/var/") {
-            return "/private" + url.path
-        }
-        return url.path
     }
 }

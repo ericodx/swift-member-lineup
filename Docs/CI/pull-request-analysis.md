@@ -47,6 +47,12 @@ Runs static analysis tools to check code quality.
 | SwiftLint | Code style and conventions | `reports/swiftlint.json` |
 | Periphery | Dead code detection | `reports/periphery.json` |
 | Gitleaks | Secret detection | `reports/gitleaks.sarif` |
+| jscpd | Code duplication detection | `reports/jscpd-report.json` |
+
+**jscpd Configuration**:
+- Minimum lines: 10
+- Minimum tokens: 50
+- Format: Swift
 
 ### 3. quality-gate
 
@@ -60,6 +66,7 @@ Evaluates quality metrics and posts results to the PR.
 | Metric | Default | Variable |
 |--------|---------|----------|
 | Coverage | 95% | `COVERAGE_THRESHOLD` |
+| Max duplication | 5% | `MAX_DUPLICATION` |
 | Max lint violations | 10 | `MAX_LINT_VIOLATIONS` |
 | Max dead code | 0 | `MAX_DEAD_CODE` |
 | Fail on secrets | true | `FAIL_ON_SECRETS` |
@@ -83,9 +90,10 @@ The workflow posts a comment on the PR with a quality report:
 | Metric | Value | Status | Threshold |
 |--------|-------|--------|----------|
 | Coverage | 98.5% | ✓ | >= 95% |
+| Code duplication | 2.1% (3 clones) | ✓ | <= 5% |
 | Linter violations | 2 | ~ | <= 10 |
-| Dead code (Periphery) | 0 | ~ | <= 0 |
-| Secrets (Gitleaks) | 0 | ✓ | 0 |
+| Dead code | 0 | ~ | <= 0 |
+| Secrets | 0 | ✓ | 0 |
 
 Strict mode: false
 ```
@@ -98,10 +106,11 @@ Set these in Settings → Secrets and variables → Actions → Variables:
 
 ```yaml
 COVERAGE_THRESHOLD: 95      # Minimum coverage percentage
+MAX_DUPLICATION: 5          # Maximum allowed code duplication percentage
 MAX_LINT_VIOLATIONS: 10     # Maximum allowed lint issues
 MAX_DEAD_CODE: 0            # Maximum allowed dead code findings
 FAIL_ON_SECRETS: true       # Fail if secrets detected
-STRICT_MODE: false          # Enforce lint and dead code limits
+STRICT_MODE: false          # Enforce lint, dead code and duplication limits
 ```
 
 ### Strict Mode
@@ -109,10 +118,11 @@ STRICT_MODE: false          # Enforce lint and dead code limits
 When `STRICT_MODE` is `true`:
 - Lint violations above threshold fail the build
 - Dead code above threshold fails the build
+- Code duplication above threshold fails the build
 
 When `STRICT_MODE` is `false`:
 - Only coverage and secrets are enforced
-- Lint and dead code are reported but don't fail
+- Lint, dead code and duplication are reported but don't fail
 
 ## Workflow Diagram
 

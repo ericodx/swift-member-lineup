@@ -145,106 +145,89 @@ final class UnifiedMemberDiscoveryVisitor<Builder: MemberOutputBuilder>: SyntaxV
     // MARK: - Nested Types
 
     override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
-        if depth == 0, let item = currentItem {
-            record(
-                MemberDiscoveryInfo(
-                    name: node.name.text,
-                    kind: .subtype,
-                    position: node.positionAfterSkippingLeadingTrivia,
-                    item: item,
-                    visibility: extractVisibility(from: node.modifiers),
-                    isAnnotated: !node.attributes.isEmpty
-                ))
-        }
+        recordNestedTypeIfNeeded(
+            name: node.name.text,
+            position: node.positionAfterSkippingLeadingTrivia,
+            modifiers: node.modifiers,
+            attributes: node.attributes
+        )
         depth += 1
         return .visitChildren
     }
 
-    override func visitPost(_: ClassDeclSyntax) {
-        depth -= 1
-    }
+    override func visitPost(_: ClassDeclSyntax) { depth -= 1 }
 
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
-        if depth == 0, let item = currentItem {
-            record(
-                MemberDiscoveryInfo(
-                    name: node.name.text,
-                    kind: .subtype,
-                    position: node.positionAfterSkippingLeadingTrivia,
-                    item: item,
-                    visibility: extractVisibility(from: node.modifiers),
-                    isAnnotated: !node.attributes.isEmpty
-                ))
-        }
+        recordNestedTypeIfNeeded(
+            name: node.name.text,
+            position: node.positionAfterSkippingLeadingTrivia,
+            modifiers: node.modifiers,
+            attributes: node.attributes
+        )
         depth += 1
         return .visitChildren
     }
 
-    override func visitPost(_: StructDeclSyntax) {
-        depth -= 1
-    }
+    override func visitPost(_: StructDeclSyntax) { depth -= 1 }
 
     override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
-        if depth == 0, let item = currentItem {
-            record(
-                MemberDiscoveryInfo(
-                    name: node.name.text,
-                    kind: .subtype,
-                    position: node.positionAfterSkippingLeadingTrivia,
-                    item: item,
-                    visibility: extractVisibility(from: node.modifiers),
-                    isAnnotated: !node.attributes.isEmpty
-                ))
-        }
+        recordNestedTypeIfNeeded(
+            name: node.name.text,
+            position: node.positionAfterSkippingLeadingTrivia,
+            modifiers: node.modifiers,
+            attributes: node.attributes
+        )
         depth += 1
         return .visitChildren
     }
 
-    override func visitPost(_: EnumDeclSyntax) {
-        depth -= 1
-    }
+    override func visitPost(_: EnumDeclSyntax) { depth -= 1 }
 
     override func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind {
-        if depth == 0, let item = currentItem {
-            record(
-                MemberDiscoveryInfo(
-                    name: node.name.text,
-                    kind: .subtype,
-                    position: node.positionAfterSkippingLeadingTrivia,
-                    item: item,
-                    visibility: extractVisibility(from: node.modifiers),
-                    isAnnotated: !node.attributes.isEmpty
-                ))
-        }
+        recordNestedTypeIfNeeded(
+            name: node.name.text,
+            position: node.positionAfterSkippingLeadingTrivia,
+            modifiers: node.modifiers,
+            attributes: node.attributes
+        )
         depth += 1
         return .visitChildren
     }
 
-    override func visitPost(_: ActorDeclSyntax) {
-        depth -= 1
-    }
+    override func visitPost(_: ActorDeclSyntax) { depth -= 1 }
 
     override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
-        if depth == 0, let item = currentItem {
-            record(
-                MemberDiscoveryInfo(
-                    name: node.name.text,
-                    kind: .subtype,
-                    position: node.positionAfterSkippingLeadingTrivia,
-                    item: item,
-                    visibility: extractVisibility(from: node.modifiers),
-                    isAnnotated: !node.attributes.isEmpty
-                ))
-        }
+        recordNestedTypeIfNeeded(
+            name: node.name.text,
+            position: node.positionAfterSkippingLeadingTrivia,
+            modifiers: node.modifiers,
+            attributes: node.attributes
+        )
         depth += 1
         return .visitChildren
     }
 
-    override func visitPost(_: ProtocolDeclSyntax) {
-        depth -= 1
-    }
+    override func visitPost(_: ProtocolDeclSyntax) { depth -= 1 }
 
     // MARK: - Private Helpers
+
+    private func recordNestedTypeIfNeeded(
+        name: String,
+        position: AbsolutePosition,
+        modifiers: DeclModifierListSyntax,
+        attributes: AttributeListSyntax
+    ) {
+        guard depth == 0, let item = currentItem else { return }
+        record(
+            MemberDiscoveryInfo(
+                name: name,
+                kind: .subtype,
+                position: position,
+                item: item,
+                visibility: extractVisibility(from: modifiers),
+                isAnnotated: !attributes.isEmpty
+            ))
+    }
 
     private func record(_ info: MemberDiscoveryInfo) {
         let output = builder.build(from: info, using: sourceLocationConverter)

@@ -32,30 +32,30 @@ struct PipelineCoordinatorTests {
 
     @Test("Given CheckResult, when stored as Sendable, then can be recovered")
     func checkResultIsSendable() {
-        let result = PipelineCoordinator.CheckResult(
+        let result = CheckResult(
             path: "/test/path.swift",
             results: [],
             needsReorder: true
         )
         let sendable: any Sendable = result
 
-        #expect((sendable as? PipelineCoordinator.CheckResult)?.path == result.path)
-        #expect((sendable as? PipelineCoordinator.CheckResult)?.needsReorder == result.needsReorder)
+        #expect((sendable as? CheckResult)?.path == result.path)
+        #expect((sendable as? CheckResult)?.needsReorder == result.needsReorder)
     }
 
     // MARK: - FixResult Sendable
 
     @Test("Given FixResult, when stored as Sendable, then can be recovered")
     func fixResultIsSendable() {
-        let result = PipelineCoordinator.FixResult(
+        let result = FixResult(
             path: "/test/path.swift",
             source: "struct Test {}",
             modified: true
         )
         let sendable: any Sendable = result
 
-        #expect((sendable as? PipelineCoordinator.FixResult)?.path == result.path)
-        #expect((sendable as? PipelineCoordinator.FixResult)?.modified == result.modified)
+        #expect((sendable as? FixResult)?.path == result.path)
+        #expect((sendable as? FixResult)?.modified == result.modified)
     }
 
     // MARK: - checkFiles Tests

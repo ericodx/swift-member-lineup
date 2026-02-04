@@ -313,16 +313,16 @@ struct CheckCommandTests {
         let file2 = tempDir.appendingPathComponent("File2.swift")
 
         try """
-            struct Test1 {
-                init() {}
-            }
-            """.write(to: file1, atomically: true, encoding: .utf8)
+        struct Test1 {
+            init() {}
+        }
+        """.write(to: file1, atomically: true, encoding: .utf8)
 
         try """
-            struct Test2 {
-                init() {}
-            }
-            """.write(to: file2, atomically: true, encoding: .utf8)
+        struct Test2 {
+            init() {}
+        }
+        """.write(to: file2, atomically: true, encoding: .utf8)
 
         defer { try? FileManager.default.removeItem(at: tempDir) }
 
@@ -353,16 +353,16 @@ struct CheckCommandTests {
         let file2 = nestedDir.appendingPathComponent("Nested.swift")
 
         try """
-            struct Root {
-                init() {}
-            }
-            """.write(to: file1, atomically: true, encoding: .utf8)
+        struct Root {
+            init() {}
+        }
+        """.write(to: file1, atomically: true, encoding: .utf8)
 
         try """
-            struct Nested {
-                init() {}
-            }
-            """.write(to: file2, atomically: true, encoding: .utf8)
+        struct Nested {
+            init() {}
+        }
+        """.write(to: file2, atomically: true, encoding: .utf8)
 
         defer { try? FileManager.default.removeItem(at: tempDir) }
 
