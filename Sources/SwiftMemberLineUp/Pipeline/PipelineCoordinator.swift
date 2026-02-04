@@ -9,20 +9,6 @@ actor PipelineCoordinator {
 
     // MARK: - Check Operation
 
-    struct CheckResult: Sendable {
-        let path: String
-        let results: [TypeReorderResult]
-        let needsReorder: Bool
-    }
-
-    // MARK: - Fix Operation
-
-    struct FixResult: Sendable {
-        let path: String
-        let source: String
-        let modified: Bool
-    }
-
     func checkFiles(_ paths: [String]) async throws -> [CheckResult] {
         let pipeline = ParseStage()
             .then(ClassifyStage())
@@ -42,6 +28,8 @@ actor PipelineCoordinator {
             return results
         }
     }
+
+    // MARK: - Fix Operation
 
     func fixFiles(_ paths: [String], dryRun: Bool) async throws -> [FixResult] {
         let pipeline = ParseStage()
@@ -63,6 +51,8 @@ actor PipelineCoordinator {
             return results
         }
     }
+
+    // MARK: - Private Helpers
 
     private func checkSingleFile(
         path: String, pipeline: any Stage<ParseInput, ReorderOutput>
