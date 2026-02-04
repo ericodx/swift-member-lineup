@@ -45,18 +45,20 @@ Add Swift Member LineUp as a build phase to automatically check files on each bu
 
 ```bash
 # Swift Member LineUp Check
-# Warns if files need reordering but doesn't fail the build
+# Shows warnings in Xcode Issue Navigator without failing the build
 
 # Path to swift-member-lineup (Homebrew on Apple Silicon)
 LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
 # For Intel Mac, use: LINEUP_CMD="/usr/local/bin/swift-member-lineup"
 
 if [ -x "$LINEUP_CMD" ]; then
-    "$LINEUP_CMD" check --path "${SRCROOT}/Sources" --warn-only
+    "$LINEUP_CMD" check --xcode --path "${SRCROOT}/Sources"
 else
     echo "warning: Swift Member LineUp not installed at $LINEUP_CMD"
 fi
 ```
+
+The `--xcode` flag outputs warnings in Xcode-compatible format and implies `--warn-only`.
 
 ### Strict Script (Fail Build on Issues)
 
