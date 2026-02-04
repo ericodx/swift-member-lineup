@@ -262,4 +262,114 @@ struct CheckCommandTests {
             try await command.run()
         }
     }
+
+    // MARK: - Warn Only Flag
+
+    @Test("Given files needing reorder with warn-only flag, when executing check, then does not throw")
+    func warnOnlyDoesNotThrowWhenChangesNeeded() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    func doSomething() {}
+                    init() {}
+                }
+                """)
+        defer { removeTempFile(tempFile) }
+
+        let command = try CheckCommand.parse(["--warn-only", "--quiet", tempFile])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given ordered files with warn-only flag, when executing check, then does not throw")
+    func warnOnlyDoesNotThrowWhenNoChangesNeeded() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    init() {}
+                    func doSomething() {}
+                }
+                """)
+        defer { removeTempFile(tempFile) }
+
+        let command = try CheckCommand.parse(["--warn-only", "--quiet", tempFile])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+    }
+
+    // MARK: - Path Flag
+
+    @Test("Given directory with Swift files, when using --path flag, then finds and checks all files")
+    func pathFlagFindsSwiftFiles() async throws {
+        let tempDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+        let file1 = tempDir.appendingPathComponent("File1.swift")
+        let file2 = tempDir.appendingPathComponent("File2.swift")
+
+        try """
+            struct Test1 {
+                init() {}
+            }
+            """.write(to: file1, atomically: true, encoding: .utf8)
+
+        try """
+            struct Test2 {
+                init() {}
+            }
+            """.write(to: file2, atomically: true, encoding: .utf8)
+
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+
+        let command = try CheckCommand.parse(["--path", tempDir.path, "--quiet"])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given no files and no path, when executing check, then throws validation error")
+    func noFilesOrPathThrowsError() async throws {
+        let command = try CheckCommand.parse([])
+
+        await #expect(throws: ValidationError.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given path to directory with nested Swift files, when using --path flag, then finds files recursively")
+    func pathFlagFindsNestedFiles() async throws {
+        let tempDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        let nestedDir = tempDir.appendingPathComponent("Nested")
+        try FileManager.default.createDirectory(at: nestedDir, withIntermediateDirectories: true)
+
+        let file1 = tempDir.appendingPathComponent("Root.swift")
+        let file2 = nestedDir.appendingPathComponent("Nested.swift")
+
+        try """
+            struct Root {
+                init() {}
+            }
+            """.write(to: file1, atomically: true, encoding: .utf8)
+
+        try """
+            struct Nested {
+                init() {}
+            }
+            """.write(to: file2, atomically: true, encoding: .utf8)
+
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+
+        let command = try CheckCommand.parse(["--path", tempDir.path, "--quiet"])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+    }
 }
