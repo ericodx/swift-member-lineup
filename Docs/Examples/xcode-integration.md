@@ -4,7 +4,17 @@ Guide for integrating Swift Member LineUp into your Xcode workflow.
 
 ## Installation
 
-First, build and install Swift Member LineUp:
+### Via Homebrew (Recommended)
+
+```bash
+brew install ericodx/tap/swift-member-lineup
+```
+
+The binary will be installed at:
+- **Apple Silicon (M1/M2):** `/opt/homebrew/bin/swift-member-lineup`
+- **Intel Mac:** `/usr/local/bin/swift-member-lineup`
+
+### Build from Source
 
 ```bash
 # Clone the repository
@@ -37,10 +47,14 @@ Add Swift Member LineUp as a build phase to automatically check files on each bu
 # Swift Member LineUp Check
 # Warns if files need reordering but doesn't fail the build
 
-if which swift-member-lineup >/dev/null; then
-    swift-member-lineup check "${SRCROOT}/Sources/**/*.swift" 2>&1 || echo "warning: Swift Member LineUp found files that need reordering"
+# Path to swift-member-lineup (Homebrew on Apple Silicon)
+LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
+# For Intel Mac, use: LINEUP_CMD="/usr/local/bin/swift-member-lineup"
+
+if [ -x "$LINEUP_CMD" ]; then
+    "$LINEUP_CMD" check --path "${SRCROOT}/Sources" --warn-only
 else
-    echo "warning: Swift Member LineUp not installed"
+    echo "warning: Swift Member LineUp not installed at $LINEUP_CMD"
 fi
 ```
 
@@ -50,14 +64,14 @@ fi
 # Swift Member LineUp Check (Strict)
 # Fails the build if files need reordering
 
-if which swift-member-lineup >/dev/null; then
-    swift-member-lineup check "${SRCROOT}/Sources/**/*.swift"
-    if [ $? -ne 0 ]; then
-        echo "error: Files need reordering. Run 'swift-member-lineup fix' to fix."
-        exit 1
-    fi
+# Path to swift-member-lineup (Homebrew on Apple Silicon)
+LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
+# For Intel Mac, use: LINEUP_CMD="/usr/local/bin/swift-member-lineup"
+
+if [ -x "$LINEUP_CMD" ]; then
+    "$LINEUP_CMD" check --path "${SRCROOT}/Sources"
 else
-    echo "warning: Swift Member LineUp not installed"
+    echo "warning: Swift Member LineUp not installed at $LINEUP_CMD"
 fi
 ```
 
@@ -67,10 +81,14 @@ fi
 # Swift Member LineUp Auto-Fix
 # Automatically fixes files before building
 
-if which swift-member-lineup >/dev/null; then
-    swift-member-lineup fix "${SRCROOT}/Sources/**/*.swift"
+# Path to swift-member-lineup (Homebrew on Apple Silicon)
+LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
+# For Intel Mac, use: LINEUP_CMD="/usr/local/bin/swift-member-lineup"
+
+if [ -x "$LINEUP_CMD" ]; then
+    "$LINEUP_CMD" fix --path "${SRCROOT}/Sources"
 else
-    echo "warning: Swift Member LineUp not installed"
+    echo "warning: Swift Member LineUp not installed at $LINEUP_CMD"
 fi
 ```
 
@@ -180,6 +198,10 @@ Save as `~/Scripts/swift-member-lineup-fix.sh`:
 ```bash
 #!/bin/bash
 
+# Path to swift-member-lineup (Homebrew on Apple Silicon)
+LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
+# For Intel Mac, use: LINEUP_CMD="/usr/local/bin/swift-member-lineup"
+
 # Get current Xcode project directory
 PROJECT_DIR=$(osascript -e 'tell application "Xcode" to return path of document 1')
 PROJECT_DIR=$(dirname "$PROJECT_DIR")
@@ -187,7 +209,7 @@ PROJECT_DIR=$(dirname "$PROJECT_DIR")
 cd "$PROJECT_DIR"
 
 # Run fix
-swift-member-lineup fix Sources/**/*.swift
+"$LINEUP_CMD" fix --path Sources
 
 # Notify
 osascript -e 'display notification "Swift Member LineUp fix complete" with title "Xcode"'
@@ -223,19 +245,33 @@ let package = Package(
 
 ## Troubleshooting
 
-### "swift-member-lineup: command not found"
+### "swift-member-lineup: command not found" in Xcode Build Phase
 
-Add the installation path to your script:
+Xcode Build Phases use `/bin/sh` and do not load your shell profile (~/.zshrc or ~/.bashrc), so commands installed via Homebrew are not in the PATH.
+
+**Solution:** Use the absolute path to the binary:
 
 ```bash
-export PATH="$PATH:$HOME/bin"
-swift-member-lineup check ...
+# Apple Silicon (M1/M2)
+LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
+
+# Intel Mac
+LINEUP_CMD="/usr/local/bin/swift-member-lineup"
 ```
 
-Or use absolute path:
+To find your installation path, run in Terminal:
+```bash
+which swift-member-lineup
+```
+
+### Glob patterns not working in Build Phase
+
+Xcode Build Phases use `/bin/sh` which does not support `**` glob patterns (globstar). Use the `--path` option instead:
 
 ```bash
-~/bin/swift-member-lineup check ...
+# Instead of: swift-member-lineup check "${SRCROOT}/Sources/**/*.swift"
+# Use:
+swift-member-lineup check --path "${SRCROOT}/Sources"
 ```
 
 ### Build Phase Not Running
