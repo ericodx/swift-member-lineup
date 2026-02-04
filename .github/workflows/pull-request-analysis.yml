@@ -96,7 +96,9 @@ jobs:
           swift-version: "6.2.3"
 
       - name: Install analysis tools
-        run: brew install swiftlint gitleaks periphery
+        run: |
+          brew install swiftlint gitleaks periphery
+          npm install -g jscpd
 
       - name: SwiftLint
         run: |
@@ -112,6 +114,15 @@ jobs:
       - name: Gitleaks (secrets)
         run: |
           gitleaks detect --report-path reports/gitleaks.sarif --report-format sarif || true
+
+      - name: Code duplication (jscpd)
+        run: |
+          jscpd Sources \
+            --min-lines 10 \
+            --min-tokens 50 \
+            --reporters json \
+            --output reports \
+            --format "swift" || true
 
       - name: Upload reports artifact
         uses: actions/upload-artifact@v6
@@ -142,12 +153,14 @@ jobs:
           FAIL_ON_SECRETS: ${{ vars.FAIL_ON_SECRETS }}
           MAX_LINT_VIOLATIONS: ${{ vars.MAX_LINT_VIOLATIONS }}
           MAX_DEAD_CODE: ${{ vars.MAX_DEAD_CODE }}
+          MAX_DUPLICATION: ${{ vars.MAX_DUPLICATION }}
           STRICT_MODE: ${{ vars.STRICT_MODE }}
         run: |
           THRESHOLD=${COVERAGE_THRESHOLD:-95}
           FAIL_SECRETS=${FAIL_ON_SECRETS:-true}
           MAX_LINT=${MAX_LINT_VIOLATIONS:-10}
           MAX_DEAD=${MAX_DEAD_CODE:-0}
+          MAX_DUP=${MAX_DUPLICATION:-5}
           STRICT=${STRICT_MODE:-false}
 
           FAIL=0
@@ -170,11 +183,28 @@ jobs:
           DEAD_CODE_COUNT=$(jq -r 'length // 0' reports/periphery.json 2>/dev/null || echo 0)
           SECRETS_COUNT=$(jq -r '.runs[0].results | length // 0' reports/gitleaks.sarif 2>/dev/null || echo 0)
 
+          # Code duplication analysis
+          if [ -f reports/jscpd-report.json ]; then
+            DUPLICATION=$(jq -r '.statistics.total.percentage // 0' reports/jscpd-report.json 2>/dev/null || echo 0)
+            DUPLICATION_CLONES=$(jq -r '.statistics.total.clones // 0' reports/jscpd-report.json 2>/dev/null || echo 0)
+          else
+            DUPLICATION="0"
+            DUPLICATION_CLONES="0"
+          fi
+
           if [ "$SECRETS_COUNT" -gt 0 ] && [ "$FAIL_SECRETS" = "true" ]; then
             SECRETS_STATUS="x"
             FAIL=1
           else
             SECRETS_STATUS="✓"
+          fi
+
+          # Duplication status
+          if (( $(echo "$DUPLICATION > $MAX_DUP" | bc -l) )); then
+            DUPLICATION_STATUS="x"
+            if [ "$STRICT" = "true" ]; then FAIL=1; fi
+          else
+            DUPLICATION_STATUS="✓"
           fi
 
           if [ "$STRICT" = "true" ]; then
@@ -190,6 +220,7 @@ jobs:
           | Metric | Value | Status | Threshold |
           |--------|-------|--------|----------|
           | Coverage | $COVERAGE% | $COVERAGE_STATUS | >= $THRESHOLD% |
+          | Code duplication | ${DUPLICATION}% ($DUPLICATION_CLONES clones) | $DUPLICATION_STATUS | <= $MAX_DUP% |
           | Linter violations | $LINT_COUNT | ~ | <= $MAX_LINT |
           | Dead code (Periphery) | $DEAD_CODE_COUNT | ~ | <= $MAX_DEAD |
           | Secrets (Gitleaks) | $SECRETS_COUNT | $SECRETS_STATUS | 0 |
