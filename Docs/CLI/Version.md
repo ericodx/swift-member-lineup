@@ -53,7 +53,7 @@ This ensures the compiled binary contains the correct version from the git tag.
 ```bash
 # Development build
 swift build
-.build/debug/SwiftMemberLineUp --version
+.build/debug/swift-member-lineup --version
 # Output: 0.0.0-dev
 
 # Release binary (from GitHub Releases)

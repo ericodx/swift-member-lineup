@@ -1,6 +1,6 @@
 import Testing
 
-@testable import SwiftMemberLineUp
+@testable import swift_member_lineup
 
 @Suite("ParseStage Tests")
 struct ParseStageTests {

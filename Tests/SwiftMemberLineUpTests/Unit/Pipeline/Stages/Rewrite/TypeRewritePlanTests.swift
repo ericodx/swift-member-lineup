@@ -2,7 +2,7 @@ import SwiftParser
 import SwiftSyntax
 import Testing
 
-@testable import SwiftMemberLineUp
+@testable import swift_member_lineup
 
 @Suite("TypeRewritePlan Tests")
 struct TypeRewritePlanTests {

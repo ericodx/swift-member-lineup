@@ -1,7 +1,7 @@
 import SwiftParser
 import SwiftSyntax
 
-@testable import SwiftMemberLineUp
+@testable import swift_member_lineup
 
 // MARK: - SyntaxClassifyOutput Factory
 
