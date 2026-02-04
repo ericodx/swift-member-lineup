@@ -1,4 +1,4 @@
-@testable import SwiftMemberLineUp
+@testable import swift_member_lineup
 
 // MARK: - Mock FileReader
 

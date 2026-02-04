@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import SwiftMemberLineUp
+@testable import swift_member_lineup
 
 @Suite("PipelineCoordinator Tests")
 struct PipelineCoordinatorTests {

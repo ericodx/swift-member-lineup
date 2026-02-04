@@ -1,6 +1,6 @@
 import Testing
 
-@testable import SwiftMemberLineUp
+@testable import swift_member_lineup
 
 @Suite("MethodKind Tests")
 struct MethodKindTests {
