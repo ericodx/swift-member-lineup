@@ -372,4 +372,42 @@ struct CheckCommandTests {
             try await command.run()
         }
     }
+
+    // MARK: - Xcode Flag
+
+    @Test("Given files needing reorder with xcode flag, when executing check, then does not throw")
+    func xcodeFlagDoesNotThrow() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    func doSomething() {}
+                    init() {}
+                }
+                """)
+        defer { removeTempFile(tempFile) }
+
+        let command = try CheckCommand.parse(["--xcode", tempFile])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given ordered files with xcode flag, when executing check, then does not throw")
+    func xcodeFlagWithOrderedFilesDoesNotThrow() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    init() {}
+                    func doSomething() {}
+                }
+                """)
+        defer { removeTempFile(tempFile) }
+
+        let command = try CheckCommand.parse(["--xcode", tempFile])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+    }
 }
