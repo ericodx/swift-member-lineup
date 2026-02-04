@@ -14,10 +14,6 @@ on:
 jobs:
   build-and-release:
     runs-on: macos-26
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-      artifact_name: ${{ steps.version.outputs.artifact_name }}
-
     steps:
       - uses: actions/checkout@v6
 
@@ -41,7 +37,7 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           VERSION="${VERSION#v}"
-          echo "enum Version { static let current = \"$VERSION\" }" > Sources/SwiftMemberLineUp/Version.swift
+          sed -i '' "s/0.0.0-dev/$VERSION/" Sources/SwiftMemberLineUp/Version.swift
 
       - name: Build
         run: swift build -c release
@@ -61,21 +57,3 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  update-homebrew-tap:
-    runs-on: ubuntu-latest
-    needs: build-and-release
-
-    steps:
-      - name: Update Homebrew Formula
-        uses: mislav/bump-homebrew-formula-action@v3
-        with:
-          formula-name: swift-member-line-up
-          homebrew-tap: ericodx/homebrew-tools
-          tag-name: ${{ needs.build-and-release.outputs.version }}
-          download-url: https://github.com/ericodx/swift-member-lineup/releases/download/${{ needs.build-and-release.outputs.version }}/${{ needs.build-and-release.outputs.artifact_name }}
-          create-pullrequest: true
-          commit-message: |
-            swift-member-line-up ${{ needs.build-and-release.outputs.version }}
-        env:
-          COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TOOLS_GITHUB_TOKEN }}
