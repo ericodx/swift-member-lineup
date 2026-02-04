@@ -11,7 +11,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "SwiftMemberLineUp",
+            name: "swift-member-lineup",
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
@@ -24,7 +24,7 @@ let package = Package(
         ),
         .testTarget(
             name: "SwiftMemberLineUpTests",
-            dependencies: ["SwiftMemberLineUp"],
+            dependencies: ["swift-member-lineup"],
             resources: [
                 .copy("Snapshots/Fixtures"),
                 .copy("Snapshots/Expected")

@@ -49,8 +49,8 @@ jobs:
       - name: Package
         run: |
           mkdir -p release
-          cp .build/release/SwiftMemberLineUp release/
-          cd release && tar -czf "${{ steps.version.outputs.artifact_name }}" SwiftMemberLineUp
+          cp .build/release/swift-member-lineup release/
+          cd release && tar -czf "${{ steps.version.outputs.artifact_name }}" swift-member-lineup
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
