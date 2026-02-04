@@ -1,4 +1,5 @@
 import ArgumentParser
+import Foundation
 
 struct FixCommand: AsyncParsableCommand {
 
@@ -14,15 +15,19 @@ struct FixCommand: AsyncParsableCommand {
 
             EXAMPLES:
               swift-member-lineup fix Sources/*.swift
-              swift-member-lineup fix --dry-run Sources/**/*.swift
-              swift-member-lineup fix --quiet --config custom.yaml Sources/
+              swift-member-lineup fix --path Sources
+              swift-member-lineup fix --path Sources --dry-run
+              swift-member-lineup fix --quiet --config custom.yaml --path Sources/
             """
     )
 
     // MARK: - Arguments
 
     @Argument(help: "Swift source files to fix.")
-    var files: [String]
+    var files: [String] = []
+
+    @Option(name: .shortAndLong, help: "Directory to recursively search for Swift files.")
+    var path: String?
 
     @Option(name: .shortAndLong, help: "Path to configuration file.")
     var config: String?
@@ -36,13 +41,19 @@ struct FixCommand: AsyncParsableCommand {
     // MARK: - Execution
 
     func run() async throws {
+        let filesToFix = try resolveFiles()
+
+        guard !filesToFix.isEmpty else {
+            throw ValidationError("No Swift files found. Provide files as arguments or use --path.")
+        }
+
         let fileIO = FileIOActor()
         let fileReader = FileReader()
         let configService = ConfigurationService(fileReader: fileReader)
         let configuration = try await configService.load(configPath: config)
 
         let coordinator = PipelineCoordinator(fileIO: fileIO, configuration: configuration)
-        let results = try await coordinator.fixFiles(files, dryRun: dryRun)
+        let results = try await coordinator.fixFiles(filesToFix, dryRun: dryRun)
 
         var modifiedFiles: [String] = []
 
@@ -59,7 +70,7 @@ struct FixCommand: AsyncParsableCommand {
         }
 
         printSummary(
-            totalFiles: files.count,
+            totalFiles: filesToFix.count,
             modifiedFiles: modifiedFiles,
             dryRun: dryRun
         )
@@ -81,5 +92,39 @@ struct FixCommand: AsyncParsableCommand {
         } else {
             print("✓ \(count) \(count == 1 ? "file" : "files") reordered")
         }
+    }
+
+    private func resolveFiles() throws -> [String] {
+        var result = files
+
+        if let path = path {
+            let pathFiles = findSwiftFiles(in: path)
+            result.append(contentsOf: pathFiles)
+        }
+
+        return result
+    }
+
+    private func findSwiftFiles(in directory: String) -> [String] {
+        let fileManager = FileManager.default
+        let url = URL(fileURLWithPath: directory)
+
+        guard let enumerator = fileManager.enumerator(
+            at: url,
+            includingPropertiesForKeys: [.isRegularFileKey],
+            options: [.skipsHiddenFiles]
+        ) else {
+            return []
+        }
+
+        var swiftFiles: [String] = []
+
+        for case let fileURL as URL in enumerator {
+            if fileURL.pathExtension == "swift" {
+                swiftFiles.append(fileURL.path)
+            }
+        }
+
+        return swiftFiles.sorted()
     }
 }
