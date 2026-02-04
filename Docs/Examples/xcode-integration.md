@@ -18,15 +18,12 @@ Add Swift Member LineUp as a build phase to automatically check files on each bu
 ### Check Script (Warning on Issues)
 
 ```bash
-# Swift Member LineUp Check
-# Shows warnings in Xcode Issue Navigator without failing the build
+export PATH="/opt/homebrew/bin:$PATH"
 
-LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
-
-if [ -x "$LINEUP_CMD" ]; then
-    "$LINEUP_CMD" check --xcode --path "${SRCROOT}/Sources"
+if command -v swift-member-lineup >/dev/null; then
+    swift-member-lineup check --xcode --path "${SRCROOT}/Sources"
 else
-    echo "warning: Swift Member LineUp not installed at $LINEUP_CMD"
+    echo "warning: swift-member-lineup not installed"
 fi
 ```
 
@@ -35,30 +32,24 @@ The `--xcode` flag outputs warnings in Xcode-compatible format and does not fail
 ### Strict Script (Fail Build on Issues)
 
 ```bash
-# Swift Member LineUp Check (Strict)
-# Fails the build if files need reordering
+export PATH="/opt/homebrew/bin:$PATH"
 
-LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
-
-if [ -x "$LINEUP_CMD" ]; then
-    "$LINEUP_CMD" check --path "${SRCROOT}/Sources"
+if command -v swift-member-lineup >/dev/null; then
+    swift-member-lineup check --path "${SRCROOT}/Sources"
 else
-    echo "warning: Swift Member LineUp not installed at $LINEUP_CMD"
+    echo "warning: swift-member-lineup not installed"
 fi
 ```
 
 ### Auto-Fix Script
 
 ```bash
-# Swift Member LineUp Auto-Fix
-# Automatically fixes files before building
+export PATH="/opt/homebrew/bin:$PATH"
 
-LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
-
-if [ -x "$LINEUP_CMD" ]; then
-    "$LINEUP_CMD" fix --path "${SRCROOT}/Sources"
+if command -v swift-member-lineup >/dev/null; then
+    swift-member-lineup fix --path "${SRCROOT}/Sources"
 else
-    echo "warning: Swift Member LineUp not installed at $LINEUP_CMD"
+    echo "warning: swift-member-lineup not installed"
 fi
 ```
 
@@ -100,8 +91,7 @@ Save as `~/Scripts/swift-member-lineup-fix.sh`:
 
 ```bash
 #!/bin/bash
-
-LINEUP_CMD="/opt/homebrew/bin/swift-member-lineup"
+export PATH="/opt/homebrew/bin:$PATH"
 
 # Get current Xcode project directory
 PROJECT_DIR=$(osascript -e 'tell application "Xcode" to return path of document 1')
@@ -110,7 +100,7 @@ PROJECT_DIR=$(dirname "$PROJECT_DIR")
 cd "$PROJECT_DIR"
 
 # Run fix
-"$LINEUP_CMD" fix --path Sources
+swift-member-lineup fix --path Sources
 
 # Notify
 osascript -e 'display notification "Swift Member LineUp fix complete" with title "Xcode"'
@@ -127,11 +117,9 @@ chmod +x ~/Scripts/swift-member-lineup-fix.sh
 
 Xcode Build Phases use `/bin/sh` and do not load your shell profile, so Homebrew commands are not in the PATH.
 
-**Solution:** Use the absolute path `/opt/homebrew/bin/swift-member-lineup`
-
-To verify installation path:
+**Solution:** Add Homebrew to PATH at the start of your script:
 ```bash
-which swift-member-lineup
+export PATH="/opt/homebrew/bin:$PATH"
 ```
 
 ### Build Phase Not Running
