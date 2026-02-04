@@ -5,6 +5,11 @@ struct InitCommand: ParsableCommand {
 
     // MARK: - Configuration
 
+    @Flag(name: .long, help: "Overwrite existing configuration file.")
+    var force: Bool = false
+
+    // MARK: - Arguments
+
     static let configuration = CommandConfiguration(
         commandName: "init",
         abstract: "Create a default .swift-member-lineup.yaml configuration file.",
@@ -18,27 +23,9 @@ struct InitCommand: ParsableCommand {
             """
     )
 
-    // MARK: - Arguments
-
-    @Flag(name: .long, help: "Overwrite existing configuration file.")
-    var force: Bool = false
-
     // MARK: - Properties
 
     private static let configFileName = ".swift-member-lineup.yaml"
-
-    // MARK: - Execution
-
-    func run() throws {
-        let configPath = FileManager.default.currentDirectoryPath + "/" + Self.configFileName
-
-        if FileManager.default.fileExists(atPath: configPath) && !force {
-            throw InitError.configAlreadyExists(configPath)
-        }
-
-        try defaultConfigContent.write(toFile: configPath, atomically: true, encoding: .utf8)
-        print("Created \(Self.configFileName)")
-    }
 
     // MARK: - Private Helpers
 
@@ -63,5 +50,18 @@ struct InitCommand: ParsableCommand {
           strategy: separate
           respect_boundaries: true
         """
+    }
+
+    // MARK: - Execution
+
+    func run() throws {
+        let configPath = FileManager.default.currentDirectoryPath + "/" + Self.configFileName
+
+        if FileManager.default.fileExists(atPath: configPath) && !force {
+            throw InitError.configAlreadyExists(configPath)
+        }
+
+        try defaultConfigContent.write(toFile: configPath, atomically: true, encoding: .utf8)
+        print("Created \(Self.configFileName)")
     }
 }

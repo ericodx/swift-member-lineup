@@ -5,23 +5,6 @@ struct CheckCommand: AsyncParsableCommand {
 
     // MARK: - Configuration
 
-    static let configuration = CommandConfiguration(
-        commandName: "check",
-        abstract: "Analyze Swift files and report structural order.",
-        discussion: """
-            Analyzes Swift files and reports which types need member reordering. \
-            Exits with code 1 if any files need changes.
-
-            EXAMPLES:
-              swift-member-lineup check Sources/*.swift
-              swift-member-lineup check --path Sources
-              swift-member-lineup check --xcode --path Sources
-              swift-member-lineup check --config .swift-member-lineup.yaml --path Sources/
-            """
-    )
-
-    // MARK: - Arguments
-
     @Argument(help: "Swift source files to analyze.")
     var files: [String] = []
 
@@ -39,6 +22,23 @@ struct CheckCommand: AsyncParsableCommand {
 
     @Flag(name: .long, help: "Output warnings in Xcode-compatible format. Implies --warn-only.")
     var xcode: Bool = false
+
+    // MARK: - Arguments
+
+    static let configuration = CommandConfiguration(
+        commandName: "check",
+        abstract: "Analyze Swift files and report structural order.",
+        discussion: """
+            Analyzes Swift files and reports which types need member reordering. \
+            Exits with code 1 if any files need changes.
+
+            EXAMPLES:
+              swift-member-lineup check Sources/*.swift
+              swift-member-lineup check --path Sources
+              swift-member-lineup check --xcode --path Sources
+              swift-member-lineup check --config .swift-member-lineup.yaml --path Sources/
+            """
+    )
 
     // MARK: - Execution
 
