@@ -222,8 +222,8 @@ jobs:
           | Coverage | $COVERAGE% | $COVERAGE_STATUS | >= $THRESHOLD% |
           | Code duplication | ${DUPLICATION}% ($DUPLICATION_CLONES clones) | $DUPLICATION_STATUS | <= $MAX_DUP% |
           | Linter violations | $LINT_COUNT | ~ | <= $MAX_LINT |
-          | Dead code (Periphery) | $DEAD_CODE_COUNT | ~ | <= $MAX_DEAD |
-          | Secrets (Gitleaks) | $SECRETS_COUNT | $SECRETS_STATUS | 0 |
+          | Dead code | $DEAD_CODE_COUNT | ~ | <= $MAX_DEAD |
+          | Secrets | $SECRETS_COUNT | $SECRETS_STATUS | 0 |
 
           Strict mode: $STRICT
           EOF

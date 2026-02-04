@@ -92,8 +92,8 @@ The workflow posts a comment on the PR with a quality report:
 | Coverage | 98.5% | ✓ | >= 95% |
 | Code duplication | 2.1% (3 clones) | ✓ | <= 5% |
 | Linter violations | 2 | ~ | <= 10 |
-| Dead code (Periphery) | 0 | ~ | <= 0 |
-| Secrets (Gitleaks) | 0 | ✓ | 0 |
+| Dead code | 0 | ~ | <= 0 |
+| Secrets | 0 | ✓ | 0 |
 
 Strict mode: false
 ```
