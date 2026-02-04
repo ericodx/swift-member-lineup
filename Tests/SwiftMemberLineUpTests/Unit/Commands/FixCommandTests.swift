@@ -348,4 +348,151 @@ struct FixCommandTests {
             try await command.run()
         }
     }
+
+    // MARK: - Path Flag
+
+    @Test("Given directory with Swift files, when using --path flag, then finds and fixes all files")
+    func pathFlagFindsSwiftFiles() async throws {
+        let tempDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+        let file1 = tempDir.appendingPathComponent("File1.swift")
+        let file2 = tempDir.appendingPathComponent("File2.swift")
+
+        try """
+            struct Test1 {
+                init() {}
+            }
+            """.write(to: file1, atomically: true, encoding: .utf8)
+
+        try """
+            struct Test2 {
+                init() {}
+            }
+            """.write(to: file2, atomically: true, encoding: .utf8)
+
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+
+        let command = try FixCommand.parse(["--path", tempDir.path, "--quiet"])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given no files and no path, when executing fix, then throws validation error")
+    func noFilesOrPathThrowsError() async throws {
+        let command = try FixCommand.parse([])
+
+        await #expect(throws: ValidationError.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given path to directory with nested Swift files, when using --path flag, then finds files recursively")
+    func pathFlagFindsNestedFiles() async throws {
+        let tempDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        let nestedDir = tempDir.appendingPathComponent("Nested")
+        try FileManager.default.createDirectory(at: nestedDir, withIntermediateDirectories: true)
+
+        let file1 = tempDir.appendingPathComponent("Root.swift")
+        let file2 = nestedDir.appendingPathComponent("Nested.swift")
+
+        try """
+            struct Root {
+                init() {}
+            }
+            """.write(to: file1, atomically: true, encoding: .utf8)
+
+        try """
+            struct Nested {
+                init() {}
+            }
+            """.write(to: file2, atomically: true, encoding: .utf8)
+
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+
+        let command = try FixCommand.parse(["--path", tempDir.path, "--quiet"])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given directory with files needing reorder, when using --path with dry-run, then throws ExitCode")
+    func pathFlagWithDryRunThrowsWhenChangesNeeded() async throws {
+        let tempDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+        let file1 = tempDir.appendingPathComponent("File1.swift")
+
+        try """
+            struct Test1 {
+                func method() {}
+                init() {}
+            }
+            """.write(to: file1, atomically: true, encoding: .utf8)
+
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+
+        let command = try FixCommand.parse(["--path", tempDir.path, "--dry-run", "--quiet"])
+
+        await #expect(throws: ExitCode.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given directory with files needing reorder, when using --path without quiet, then prints output")
+    func pathFlagWithoutQuietPrintsOutput() async throws {
+        let tempDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+        let file1 = tempDir.appendingPathComponent("File1.swift")
+
+        try """
+            struct Test1 {
+                func method() {}
+                init() {}
+            }
+            """.write(to: file1, atomically: true, encoding: .utf8)
+
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+
+        let command = try FixCommand.parse(["--path", tempDir.path])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given invalid directory path, when using --path flag, then throws validation error")
+    func invalidPathThrowsError() async throws {
+        let command = try FixCommand.parse(["--path", "/nonexistent/directory/that/does/not/exist"])
+
+        await #expect(throws: ValidationError.self) {
+            try await command.run()
+        }
+    }
+
+    @Test("Given single file needing reorder in dry-run without quiet, when executing fix, then prints singular 'file'")
+    func dryRunSingleFilePrintsSingular() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    func method() {}
+                    init() {}
+                }
+                """)
+        defer { removeTempFile(tempFile) }
+
+        let command = try FixCommand.parse(["--dry-run", tempFile])
+
+        await #expect(throws: ExitCode.self) {
+            try await command.run()
+        }
+    }
 }

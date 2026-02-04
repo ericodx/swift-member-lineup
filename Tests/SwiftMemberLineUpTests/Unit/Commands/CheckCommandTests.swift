@@ -410,4 +410,13 @@ struct CheckCommandTests {
             try await command.run()
         }
     }
+
+    @Test("Given invalid directory path, when using --path flag, then throws validation error")
+    func invalidPathThrowsError() async throws {
+        let command = try CheckCommand.parse(["--path", "/nonexistent/directory/that/does/not/exist"])
+
+        await #expect(throws: ValidationError.self) {
+            try await command.run()
+        }
+    }
 }
