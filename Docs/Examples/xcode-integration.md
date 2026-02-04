@@ -15,7 +15,7 @@ cd swift-member-lineup
 swift build -c release
 
 # Copy to local bin (or /usr/local/bin for global access)
-cp .build/release/SwiftMemberLineUp ~/bin/swift-member-lineup
+cp .build/release/swift-member-lineup ~/bin/
 ```
 
 ## Option 1: Build Phase (Recommended)

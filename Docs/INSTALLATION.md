@@ -38,7 +38,7 @@ swift build -c release
 
 # Install to user local bin
 mkdir -p ~/.local/bin
-cp .build/release/SwiftMemberLineUp ~/.local/bin/swift-member-lineup
+cp .build/release/swift-member-lineup ~/.local/bin/
 
 # Add to PATH (add this to your ~/.zshrc)
 export PATH="$HOME/.local/bin:$PATH"
@@ -142,7 +142,7 @@ brew upgrade swift-member-lineup
 cd swift-member-lineup
 git pull origin main
 swift build -c release
-cp .build/release/SwiftMemberLineUp ~/.local/bin/swift-member-lineup
+cp .build/release/swift-member-lineup ~/.local/bin/
 ```
 
 ---

@@ -26,7 +26,7 @@ class SwiftMemberLineUp < Formula
   sha256 "placeholder"
 
   def install
-    bin.install "SwiftMemberLineUp"
+    bin.install "swift-member-lineup"
   end
 end
 ```
