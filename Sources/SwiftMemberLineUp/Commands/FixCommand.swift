@@ -41,7 +41,7 @@ struct FixCommand: AsyncParsableCommand {
     // MARK: - Execution
 
     func run() async throws {
-        let filesToFix = try resolveFiles()
+        let filesToFix = SwiftFileResolver.resolve(files: files, path: path)
 
         guard !filesToFix.isEmpty else {
             throw ValidationError("No Swift files found. Provide files as arguments or use --path.")
@@ -94,35 +94,4 @@ struct FixCommand: AsyncParsableCommand {
         }
     }
 
-    private func resolveFiles() throws -> [String] {
-        var result = files
-
-        if let path = path {
-            let pathFiles = findSwiftFiles(in: path)
-            result.append(contentsOf: pathFiles)
-        }
-
-        return result
-    }
-
-    private func findSwiftFiles(in directory: String) -> [String] {
-        let fileManager = FileManager.default
-        let url = URL(fileURLWithPath: directory)
-
-        let enumerator = fileManager.enumerator(
-            at: url,
-            includingPropertiesForKeys: [.isRegularFileKey],
-            options: [.skipsHiddenFiles]
-        )
-
-        var swiftFiles: [String] = []
-
-        while let fileURL = enumerator?.nextObject() as? URL {
-            if fileURL.pathExtension == "swift" {
-                swiftFiles.append(fileURL.path)
-            }
-        }
-
-        return swiftFiles.sorted()
-    }
 }
