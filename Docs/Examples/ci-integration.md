@@ -9,11 +9,10 @@ Swift Member LineUp's `check` command returns exit code `1` when files need reor
 ```bash
 # Exit 0 = All files correctly ordered
 # Exit 1 = Files need reordering
-swift-member-lineup check
+swift-member-lineup check --path Sources
 
-# Exit 0 = Files were reordered successfully
-# Exit 1 = No files needed reordering
-swift-member-lineup fix
+# Exit 0 = Files were reordered
+swift-member-lineup fix --path Sources
 ```
 
 ## GitHub Actions
@@ -44,7 +43,7 @@ jobs:
 
       - name: Check Swift Member LineUp
         run: |
-          swift-member-lineup check
+          swift-member-lineup check --path Sources
 ```
 
 ### With Caching
@@ -80,7 +79,7 @@ jobs:
 
       - name: Check Swift Member LineUp
         run: |
-          swift-member-lineup check
+          swift-member-lineup check --path Sources
 ```
 
 ### Auto-Fix and Commit
@@ -110,7 +109,7 @@ jobs:
 
       - name: Fix Swift Member LineUp
         run: |
-          swift-member-lineup fix
+          swift-member-lineup fix --path Sources
 
       - name: Commit Changes
         run: |
@@ -131,7 +130,7 @@ Always include your `.swift-member-lineup.yaml` in your repository:
 # .github/workflows/swift-member-lineup.yml
 - name: Check Swift Member LineUp
   run: |
-    swift-member-lineup check --config .swift-member-lineup.yaml
+    swift-member-lineup check --config .swift-member-lineup.yaml --path Sources
 ```
 
 ### Performance
@@ -149,7 +148,7 @@ Swift Member LineUp works well alongside other code quality tools:
   run: swiftlint
 
 - name: Check Swift Member LineUp
-  run: swift-member-lineup check
+  run: swift-member-lineup check --path Sources
 
 - name: Run Tests
   run: swift test
