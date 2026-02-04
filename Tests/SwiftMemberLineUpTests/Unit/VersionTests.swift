@@ -36,14 +36,14 @@ struct VersionTests {
     @Test("Given Version.current, when accessed on macOS, then contains macos in platform")
     func currentContainsMacOS() {
         #if os(macOS)
-        #expect(Version.current.contains("macos"))
+            #expect(Version.current.contains("macos"))
         #endif
     }
 
     @Test("Given Version.current, when accessed on ARM, then contains arm64 in platform")
     func currentContainsArm64() {
         #if arch(arm64)
-        #expect(Version.current.contains("arm64"))
+            #expect(Version.current.contains("arm64"))
         #endif
     }
 }

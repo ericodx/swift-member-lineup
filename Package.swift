@@ -27,7 +27,7 @@ let package = Package(
             dependencies: ["swift-member-lineup"],
             resources: [
                 .copy("Snapshots/Fixtures"),
-                .copy("Snapshots/Expected")
+                .copy("Snapshots/Expected"),
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v6)
