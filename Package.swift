@@ -3,7 +3,16 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftMemberLineUp",
-    platforms: [.macOS(.v26)],
+    platforms: [
+        .macOS(.v12),
+        .iOS(.v15),
+        .tvOS(.v15),
+        .watchOS(.v8),
+        .visionOS(.v1),
+    ],
+    products: [
+        .plugin(name: "SwiftMemberLineUpPlugin", targets: ["SwiftMemberLineUpPlugin"])
+    ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "602.0.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.7.0"),
@@ -32,6 +41,11 @@ let package = Package(
             swiftSettings: [
                 .swiftLanguageMode(.v6)
             ]
+        ),
+        .plugin(
+            name: "SwiftMemberLineUpPlugin",
+            capability: .buildTool(),
+            dependencies: ["swift-member-lineup"]
         ),
     ]
 )

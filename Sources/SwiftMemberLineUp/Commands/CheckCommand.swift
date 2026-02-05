@@ -23,6 +23,9 @@ struct CheckCommand: AsyncParsableCommand {
     @Flag(name: .long, help: "Output warnings in Xcode-compatible format. Implies --warn-only.")
     var xcode: Bool = false
 
+    @Option(name: .long, help: "Write a marker file after execution (for build tool plugins).")
+    var output: String?
+
     // MARK: - Arguments
 
     static let configuration = CommandConfiguration(
@@ -89,10 +92,21 @@ struct CheckCommand: AsyncParsableCommand {
             )
         }
 
+        if let outputPath = output {
+            try writeMarkerFile(to: outputPath)
+        }
+
         let shouldFail = !filesNeedingReorder.isEmpty && !warnOnly && !xcode
         if shouldFail {
             throw ExitCode(1)
         }
+    }
+
+    private func writeMarkerFile(to path: String) throws {
+        let url = URL(fileURLWithPath: path)
+        let directory = url.deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try Data().write(to: url)
     }
 
     // MARK: - Private Helpers
