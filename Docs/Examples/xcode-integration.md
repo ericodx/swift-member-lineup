@@ -2,9 +2,64 @@
 
 Guide for integrating Swift Member LineUp into your Xcode workflow.
 
-## Build Phase (Recommended)
+---
 
-Add Swift Member LineUp as a build phase to automatically check files on each build.
+## Build Tool Plugin (Recommended)
+
+The Build Tool Plugin provides native Xcode integration with zero configuration. Warnings appear inline in the editor during builds.
+
+### Swift Package Manager Projects
+
+Add the plugin to your `Package.swift`:
+
+```swift
+// swift-tools-version: 5.9
+import PackageDescription
+
+let package = Package(
+    name: "MyApp",
+    dependencies: [
+        .package(url: "https://github.com/ericodx/swift-member-lineup", from: "1.2.0"),
+    ],
+    targets: [
+        .target(
+            name: "MyApp",
+            plugins: [
+                .plugin(name: "SwiftMemberLineUpPlugin", package: "swift-member-lineup")
+            ]
+        ),
+    ]
+)
+```
+
+### Xcode Projects (.xcodeproj)
+
+1. In Xcode, go to **File** → **Add Package Dependencies**
+2. Enter: `https://github.com/ericodx/swift-member-lineup`
+3. Select your target → **Build Phases** tab
+4. Expand **Run Build Tool Plug-ins**
+5. Click **+** and add **SwiftMemberLineUpPlugin**
+
+### How It Works
+
+The plugin runs `swift-member-lineup check --xcode` during each build:
+
+- Analyzes all Swift files in the target
+- Reports warnings inline in the Xcode editor
+- Does not fail the build (warnings only)
+- Uses `.swift-member-lineup.yaml` if present in the project root
+
+### Limitations
+
+Due to SPM sandbox restrictions, the plugin can only run `check`. It cannot modify source files, so `fix` is not available via the plugin.
+
+For auto-fix functionality, use the CLI directly or a Build Phase script.
+
+---
+
+## Build Phase (Alternative)
+
+For more control over execution, or to use `fix` mode, add a Run Script Build Phase.
 
 ### Setup Steps
 
