@@ -419,4 +419,134 @@ struct CheckCommandTests {
             try await command.run()
         }
     }
+
+    // MARK: - Output Flag
+
+    @Test("Given output flag, when executing check on ordered files, then creates marker file")
+    func outputFlagCreatesMarkerFile() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    init() {}
+                    func doSomething() {}
+                }
+                """)
+        let outputPath = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathComponent("marker.txt")
+        defer {
+            removeTempFile(tempFile)
+            try? FileManager.default.removeItem(at: outputPath.deletingLastPathComponent())
+        }
+
+        let command = try CheckCommand.parse(["--output", outputPath.path, "--quiet", tempFile])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+
+        #expect(FileManager.default.fileExists(atPath: outputPath.path))
+    }
+
+    @Test("Given output flag, when executing check on unordered files, then creates marker file before throwing")
+    func outputFlagCreatesMarkerFileEvenWhenFailing() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    func doSomething() {}
+                    init() {}
+                }
+                """)
+        let outputPath = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathComponent("marker.txt")
+        defer {
+            removeTempFile(tempFile)
+            try? FileManager.default.removeItem(at: outputPath.deletingLastPathComponent())
+        }
+
+        let command = try CheckCommand.parse(["--output", outputPath.path, "--quiet", tempFile])
+
+        await #expect(throws: ExitCode.self) {
+            try await command.run()
+        }
+
+        #expect(FileManager.default.fileExists(atPath: outputPath.path))
+    }
+
+    @Test("Given output flag with nested directory, when executing check, then creates intermediate directories")
+    func outputFlagCreatesIntermediateDirectories() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    init() {}
+                }
+                """)
+        let outputPath = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathComponent("nested")
+            .appendingPathComponent("deep")
+            .appendingPathComponent("marker.txt")
+        defer {
+            removeTempFile(tempFile)
+            try? FileManager.default.removeItem(
+                at: outputPath.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            )
+        }
+
+        let command = try CheckCommand.parse(["--output", outputPath.path, "--quiet", tempFile])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+
+        #expect(FileManager.default.fileExists(atPath: outputPath.path))
+    }
+
+    @Test("Given output flag with xcode flag, when executing check, then creates marker file")
+    func outputFlagWorksWithXcodeFlag() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    func doSomething() {}
+                    init() {}
+                }
+                """)
+        let outputPath = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathComponent("marker.txt")
+        defer {
+            removeTempFile(tempFile)
+            try? FileManager.default.removeItem(at: outputPath.deletingLastPathComponent())
+        }
+
+        let command = try CheckCommand.parse(["--output", outputPath.path, "--xcode", tempFile])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+
+        #expect(FileManager.default.fileExists(atPath: outputPath.path))
+    }
+
+    @Test("Given no output flag, when executing check, then does not create marker file")
+    func noOutputFlagDoesNotCreateMarkerFile() async throws {
+        let tempFile = createTempFile(
+            content: """
+                struct Test {
+                    init() {}
+                }
+                """)
+        let potentialOutputPath = FileManager.default.temporaryDirectory
+            .appendingPathComponent("should-not-exist-\(UUID().uuidString).txt")
+        defer { removeTempFile(tempFile) }
+
+        let command = try CheckCommand.parse(["--quiet", tempFile])
+
+        await #expect(throws: Never.self) {
+            try await command.run()
+        }
+
+        #expect(!FileManager.default.fileExists(atPath: potentialOutputPath.path))
+    }
 }
