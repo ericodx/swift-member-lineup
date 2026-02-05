@@ -1,6 +1,6 @@
 # Swift Member LineUp
 
-![Platform](https://img.shields.io/badge/platform-macOS-orange?logo=apple&logoColor=white)
+![Platform](https://img.shields.io/badge/platform-macOS%2012%2B%20%7C%20iOS%2015%2B-orange?logo=apple&logoColor=white)
 ![Swift](https://img.shields.io/badge/swift-6.0+-orange?logo=swift&logoColor=white)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=deploy-on-friday-swift-member-lineup&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=deploy-on-friday-swift-member-lineup)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=deploy-on-friday-swift-member-lineup&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=deploy-on-friday-swift-member-lineup)
@@ -84,15 +84,53 @@ swift-member-lineup fix --quiet $(find Sources -name "*.swift")
 
 ---
 
-## Quick Integration
+## Xcode Integration
 
-### Xcode Build Phase
+### Build Tool Plugin (Recommended)
+
+The easiest way to integrate Swift Member LineUp into your Xcode workflow is via the **Build Tool Plugin**. It runs automatically during builds and shows warnings inline in the editor.
+
+**Swift Package Manager:**
+
+```swift
+// Package.swift
+dependencies: [
+    .package(url: "https://github.com/ericodx/swift-member-lineup", from: "1.2.0"),
+]
+
+targets: [
+    .target(
+        name: "MyApp",
+        plugins: [
+            .plugin(name: "SwiftMemberLineUpPlugin", package: "swift-member-lineup")
+        ]
+    ),
+]
+```
+
+**Xcode Projects:**
+
+1. Add `swift-member-lineup` as a package dependency
+2. Select your target → **Build Phases**
+3. Add **SwiftMemberLineUpPlugin** to "Run Build Tool Plug-ins"
+
+> **Note:** The plugin only supports `check` mode due to SPM sandbox restrictions. Use the CLI directly for `fix` operations.
+
+### Build Phase (Alternative)
+
+For more control or to use `fix`, add a Run Script Build Phase:
 
 ```bash
 if which swift-member-lineup > /dev/null; then
-    swift-member-lineup check --quiet $(find "${SRCROOT}/Sources" -name "*.swift")
+    swift-member-lineup check --xcode --path "${SRCROOT}/Sources"
 fi
 ```
+
+See [Xcode Integration Guide](Docs/Examples/xcode-integration.md) for complete setup options.
+
+---
+
+## CI Integration
 
 ### GitHub Actions
 
@@ -110,7 +148,7 @@ hooks:
     files: \.swift$
 ```
 
-See [Xcode Integration](Docs/Examples/xcode-integration.md) and [CI Integration](Docs/Examples/ci-integration.md) for complete guides.
+See [CI Integration](Docs/Examples/ci-integration.md) for complete guides.
 
 ---
 
