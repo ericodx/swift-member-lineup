@@ -69,11 +69,43 @@ You can download pre-compiled binaries from [GitHub Releases](https://github.com
 
 ---
 
+## Swift Package Manager (Plugin)
+
+For Xcode integration via the Build Tool Plugin, add the package as a dependency:
+
+```swift
+// Package.swift
+dependencies: [
+    .package(url: "https://github.com/ericodx/swift-member-lineup", from: "1.2.0"),
+]
+
+targets: [
+    .target(
+        name: "MyApp",
+        plugins: [
+            .plugin(name: "SwiftMemberLineUpPlugin", package: "swift-member-lineup")
+        ]
+    ),
+]
+```
+
+For Xcode projects, add the package via **File** → **Add Package Dependencies** and enable the plugin in your target's Build Phases.
+
+See [Xcode Integration](Examples/xcode-integration.md) for detailed setup instructions.
+
+---
+
 ## Requirements
 
-- **macOS** 15.0 (Sequoia) or later
+### CLI (Homebrew / Manual)
+
+- **macOS** 12.0 (Monterey) or later
 - **Swift** 6.0+ (for building from source)
-- **Xcode** 15.0+ (for building from source)
+
+### Build Tool Plugin
+
+- **macOS** 12.0+ / **iOS** 15.0+ / **tvOS** 15.0+ / **watchOS** 8.0+ / **visionOS** 1.0+
+- **Xcode** 14.0+ or **Swift Package Manager** 5.9+
 
 ---
 
