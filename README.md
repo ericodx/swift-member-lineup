@@ -52,14 +52,11 @@ brew install swift-member-lineup
 # Single file
 swift-member-lineup check Sources/App/MyFile.swift
 
-# All .swift files recursively (zsh)
-swift-member-lineup check Sources/**/*.swift
-
-# All .swift files recursively (bash/portable)
-swift-member-lineup check $(find Sources -name "*.swift")
+# All .swift files in a directory (recursive)
+swift-member-lineup check --path Sources
 
 # Quiet mode (CI-friendly, only shows files needing changes)
-swift-member-lineup check --quiet $(find Sources -name "*.swift")
+swift-member-lineup check --quiet --path Sources
 ```
 
 Exit codes:
@@ -72,14 +69,14 @@ Exit codes:
 # Single file
 swift-member-lineup fix Sources/App/MyFile.swift
 
-# All .swift files recursively
-swift-member-lineup fix $(find Sources -name "*.swift")
+# All .swift files in a directory (recursive)
+swift-member-lineup fix --path Sources
 
 # Preview changes without modifying files
-swift-member-lineup fix --dry-run $(find Sources -name "*.swift")
+swift-member-lineup fix --dry-run --path Sources
 
 # Quiet mode (only show summary)
-swift-member-lineup fix --quiet $(find Sources -name "*.swift")
+swift-member-lineup fix --quiet --path Sources
 ```
 
 ---
